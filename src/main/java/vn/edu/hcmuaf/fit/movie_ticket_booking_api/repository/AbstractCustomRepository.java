@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManager;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
-public abstract class AbstractCustomRepository<T, ObjectKeyId> extends SimpleJpaRepository<T, ObjectKeyId> {
+public abstract class AbstractCustomRepository<T, Long> extends SimpleJpaRepository<T, Long> {
     protected JPAQueryFactory queryFactory;
     protected EntityManager entityManager;
     protected Class<T> domainClass;
