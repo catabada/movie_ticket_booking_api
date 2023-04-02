@@ -1,12 +1,10 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception;
 
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseError;
@@ -25,7 +23,12 @@ public class GlobalException {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<HttpResponse> handleNotFoundException(NotFoundException e) {
-        return ResponseEntity.badRequest().body(HttpResponseError.error(HttpStatus.NOT_FOUND, e.getMessage()).build());
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<HttpResponse> handleBadRequestException(BadRequestException e) {
+        return ResponseEntity.badRequest().body(HttpResponseError.error(HttpStatus.BAD_REQUEST, e.getMessage()).build());
     }
 
     @ExceptionHandler(RuntimeException.class)

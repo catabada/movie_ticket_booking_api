@@ -9,6 +9,7 @@ import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
@@ -16,9 +17,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BaseObject {
+public class BaseObject implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
     @Column(name = "state", nullable = false, columnDefinition = "varchar(20) default 'ACTIVE'")
     @Enumerated(EnumType.STRING)
