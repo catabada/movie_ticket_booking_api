@@ -20,7 +20,7 @@ public class GlobalException {
             stringBuilder.append(error.getDefaultMessage()).append(", ");
         }
         String errorMessage = stringBuilder.substring(0, stringBuilder.length() - 2);
-        return ResponseEntity.badRequest().body(HttpResponseError.error(HttpStatus.BAD_REQUEST, errorMessage.toString()).build());
+        return ResponseEntity.ok(HttpResponseError.error(HttpStatus.BAD_REQUEST, errorMessage.toString()).build());
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -30,6 +30,11 @@ public class GlobalException {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<HttpResponse> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.badRequest().body(HttpResponseError.error(HttpStatus.BAD_REQUEST, e.getMessage()).build());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<HttpResponse> handleBadRequestException(BadRequestException e) {
         return ResponseEntity.badRequest().body(HttpResponseError.error(HttpStatus.BAD_REQUEST, e.getMessage()).build());
     }
 

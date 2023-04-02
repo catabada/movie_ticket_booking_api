@@ -9,12 +9,12 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
 public interface BaseObjectMapper {
-    BaseObjectDto toObjectKeyDto(BaseObject objectKey);
+    BaseObjectDto toBaseObjectDto(BaseObject baseObject);
 
-    BaseObject toObjectKey(BaseObjectDto objectKeyDto);
+    BaseObject toBaseObject(BaseObjectDto baseObjectDto);
 
-    List<BaseObjectDto> toObjectKeyDtoList(List<BaseObject> objectKeyList);
+    List<BaseObjectDto> toBaseObjectDtoList(List<BaseObject> baseObjectList);
 
-    List<BaseObject> toObjectKeyList(List<BaseObjectDto> objectKeyDtoList);
+    List<BaseObject> toBaseObjectList(List<BaseObjectDto> baseObjectDtoList);
 
 }

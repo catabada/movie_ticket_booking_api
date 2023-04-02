@@ -16,7 +16,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.genre.GenreService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/genre")
+@RequestMapping("/genre")
 public class GenreController {
     private final GenreService genreService;
 
@@ -40,7 +40,7 @@ public class GenreController {
     @PostMapping("/create")
     public ResponseEntity<HttpResponse> createGenre(@RequestBody @Valid GenreCreate create) throws BaseException {
         GenreDto dto = genreService.createGenre(create.getGenre());
-        return ResponseEntity.ok().body(HttpResponseSuccess.success(genreService.createGenre(dto)).build());
+        return ResponseEntity.ok().body(HttpResponseSuccess.success(dto).build());
     }
 
     @DeleteMapping("/delete/{id}")

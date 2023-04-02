@@ -1,5 +1,6 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.genre;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -7,12 +8,14 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreSearchDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Genre;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.NotFoundException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.genre.GenreMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.genre.GenreCustomRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,13 +42,14 @@ public class GenreServiceImpl implements GenreService {
         Optional<GenreDto> genreDto = Optional.ofNullable(
                 genreCustomRepository.getGenre(id).map(
                         genreMapper::toGenreDto).orElseThrow(
-                        () -> new BaseException("Genre not found")
+                        () -> new BadRequestException("Genre not found")
                 )
         );
         return genreDto.get();
     }
 
     @Override
+    @Transactional
     public GenreDto createGenre(GenreDto genreDto) throws BaseException {
         GenreDto dto = genreMapper.toGenreDto(
                 genreCustomRepository.save(
@@ -53,21 +57,22 @@ public class GenreServiceImpl implements GenreService {
                 )
         );
         if (ObjectUtils.isEmpty(dto)) {
-            throw new BaseException("Create genre failed");
+            throw new BadRequestException("Create genre failed");
         }
         return dto;
     }
 
     @Override
+    @Transactional
     public void deleteGenre(Long id) throws BaseException {
         Genre genre = genreCustomRepository.getGenre(id).orElseThrow(
                 () -> new NotFoundException("Genre not found")
         );
         genre.setState(ObjectState.DELETED);
-        genre.setDeletedDate(LocalDateTime.now());
+        genre.setDeletedDate(ZonedDateTime.now());
 
         if (ObjectUtils.isEmpty(genreCustomRepository.save(genre))) {
-            throw new BaseException("Delete genre failed");
+            throw new BadRequestException("Delete genre failed");
         }
 
     }
@@ -77,10 +82,8 @@ public class GenreServiceImpl implements GenreService {
         Genre genre = genreCustomRepository.getGenre(genreDto.getId()).orElseThrow(
                 () -> new NotFoundException("Genre not found")
         );
-        genre.setName(genreDto.getName());
-        genre.setAddress(genreDto.getAddress());
-        if (ObjectUtils.isEmpty(genreCustomRepository.save(genre))) {
-            throw new BaseException("Update genre failed");
+        if (ObjectUtils.isEmpty(genreCustomRepository.save(genreMapper.toGenre(genreDto)))) {
+            throw new BadRequestException("Update genre failed");
         }
         return genreMapper.toGenreDto(genre);
     }

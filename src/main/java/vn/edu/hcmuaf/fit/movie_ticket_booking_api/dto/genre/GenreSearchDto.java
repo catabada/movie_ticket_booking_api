@@ -11,5 +11,4 @@ import lombok.experimental.SuperBuilder;
 @Setter
 public class GenreSearchDto {
     private String name;
-    private String address;
 }

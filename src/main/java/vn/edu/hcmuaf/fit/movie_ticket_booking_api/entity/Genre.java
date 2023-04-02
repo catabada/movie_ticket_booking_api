@@ -5,9 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.BaseObject;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "genre")
@@ -16,11 +18,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 @SuperBuilder
 public class Genre extends BaseObject implements Serializable {
-
     @Column(name = "name")
     private String name;
 
-    @Column(name = "address")
-    private String address;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "genres")
+    private Set<Movie> movies = new HashSet<>();
 
 }

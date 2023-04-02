@@ -1,4 +1,4 @@
-package vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre;
+package vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +7,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @SuperBuilder
-public class GenreUpdateDto extends GenreDto {
+@NoArgsConstructor
+public class MovieUpdateDto extends MovieDto {
 }

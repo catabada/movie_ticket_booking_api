@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @MappedSuperclass
 @SuperBuilder
@@ -20,15 +21,15 @@ public class BaseObject {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
-    @Column(name = "state", nullable = false, columnDefinition = "varchar(20) default 'ACTIVE'")
+    @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
     protected ObjectState state;
     @Column(name = "created_date", nullable = false)
     @CurrentTimestamp
-    protected LocalDateTime createdDate;
+    protected ZonedDateTime createdDate;
     @Column(name = "modified_date")
     @UpdateTimestamp
-    protected LocalDateTime modifiedDate;
+    protected ZonedDateTime modifiedDate;
     @Column(name = "deleted_date")
-    protected LocalDateTime deletedDate;
+    protected ZonedDateTime deletedDate;
 }
