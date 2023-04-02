@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoomState;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.room.*;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Branch;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Room;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.branch.BranchMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.room.RoomMapper;
@@ -47,14 +46,23 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public RoomDto createRoom(RoomCreate roomCreate) throws BaseException {
-//        Branch branch =
-//                branchCustomRepository.findById(roomCreate.getBranch().getId())
-//                        .orElseThrow(() -> new BadRequestException("Branch not found"));
-//        roomCreate.setBranch(branchMapper.toBranchDto(branch));
+        Branch branch =
+                branchCustomRepository.findById(roomCreate.getBranch().getId())
+                        .orElseThrow(() -> new BadRequestException("Branch not found"));
+        roomCreate.setBranch(branchMapper.toBranchDto(branch));
+
         Room room = roomMapper.toRoom(roomCreate);
         room.setRoomState(RoomState.OCCUPIED);
 
-        Room newRoom = roomCustomRepository.saveAndFlush(room);
+        Room newRoom = roomCustomRepository.save(room);
+
+        for (Seat seat : room.getSeats()) {
+            seat.setRoom(newRoom);
+        }
+
+        newRoom.setSeats(room.getSeats());
+        newRoom = roomCustomRepository.save(newRoom);
+
         return roomMapper.toRoomDto(newRoom);
     }
 

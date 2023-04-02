@@ -33,7 +33,7 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public BranchDto getBranchById(Long id) throws BaseException {
         Optional<Branch> branch = branchCustomRepository.findById(id);
-        return branchMapper.toBranchDtoWithRooms(branch.orElseThrow(() -> new NotFoundException("Branch not found")));
+        return branchMapper.toBranchDto(branch.orElseThrow(() -> new NotFoundException("Branch not found")));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class BranchServiceImpl implements BranchService {
 
         Branch newBranch = branchCustomRepository.saveAndFlush(branchMapper.toBranch(branchCreate));
 
-        return branchMapper.toBranchDtoWithRooms(newBranch);
+        return branchMapper.toBranchDto(newBranch);
     }
 
     @Override

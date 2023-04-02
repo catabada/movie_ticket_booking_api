@@ -1,5 +1,6 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.branch;
 
+import jdk.jfr.Name;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.branch.BranchDto;
@@ -23,14 +24,13 @@ public interface BranchMapper extends BaseObjectMapper {
     @Mapping(target = "seats", source = "seats", qualifiedByName = "toSeatDtoWithoutRoom")
     RoomDto toRoomDtoWithoutBranch(Room room);
 
-    @Named("toBranchDtoWithRooms")
+    @Named("toBranchDto")
     @Mapping(target = "rooms", source = "rooms", qualifiedByName = "toRoomDtoWithoutBranch")
-    BranchDto toBranchDtoWithRooms(Branch branch);
-
     BranchDto toBranchDto(Branch branch);
 
     Branch toBranch(BranchDto branchDto);
 
+    @IterableMapping(qualifiedByName = "toBranchDto")
     List<BranchDto> toBranchDtoList(List<Branch> branchList);
 
     List<Branch> toBranchList(List<BranchDto> branchDtoList);

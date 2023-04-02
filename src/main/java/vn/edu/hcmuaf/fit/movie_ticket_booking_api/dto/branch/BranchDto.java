@@ -1,5 +1,6 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.branch;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -22,5 +23,6 @@ public class BranchDto extends BaseObjectDto {
 
     protected BranchStatus status;
 
+    @JsonIgnoreProperties("branch")
     protected List<RoomDto> rooms = new ArrayList<>();
 }

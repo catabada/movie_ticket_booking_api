@@ -25,7 +25,7 @@ public class Seat extends BaseObject {
     @Column(name = "type")
     private SeatType type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
 }

@@ -1,5 +1,6 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.room;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -24,7 +25,9 @@ public class RoomDto extends BaseObjectDto {
     private RoomState roomState;
 
     @NotNull
+    @JsonIgnoreProperties("rooms")
     private BranchDto branch;
 
+    @JsonIgnoreProperties("room")
     private List<SeatDto> seats = new ArrayList<>();
 }

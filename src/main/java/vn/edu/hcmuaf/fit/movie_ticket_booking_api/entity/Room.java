@@ -14,7 +14,6 @@ import java.util.*;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@SequenceGenerator(name = "id_generator", sequenceName = "room_seq", allocationSize = 1)
 public class Room extends BaseObject {
     @Column(name = "name", nullable = false)
     private String name;
@@ -29,6 +28,6 @@ public class Room extends BaseObject {
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Seat> seats = new ArrayList<>();
 }
