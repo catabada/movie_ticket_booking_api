@@ -7,7 +7,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.BaseObject;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
+@Mapper(componentModel = "spring")
 public interface BaseObjectMapper {
     BaseObjectDto toBaseObjectDto(BaseObject baseObject);
 

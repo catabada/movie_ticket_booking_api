@@ -1,5 +1,6 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseError;
+
+import java.sql.SQLException;
 
 @RestControllerAdvice
 public class GlobalException {
@@ -31,6 +34,11 @@ public class GlobalException {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<HttpResponse> handleRuntimeException(RuntimeException e) {
         return ResponseEntity.badRequest().body(HttpResponseError.error(HttpStatus.BAD_REQUEST, e.getMessage()).build());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<HttpResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        return ResponseEntity.badRequest().body(HttpResponseError.error(HttpStatus.BAD_REQUEST, "Not found data ").build());
     }
 
     @ExceptionHandler(BadRequestException.class)

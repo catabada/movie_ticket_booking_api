@@ -8,7 +8,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.object_key.BaseObjectMa
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
+@Mapper(componentModel = "spring")
 public interface GenreMapper extends BaseObjectMapper {
     GenreDto toGenreDto(final Genre genre);
 

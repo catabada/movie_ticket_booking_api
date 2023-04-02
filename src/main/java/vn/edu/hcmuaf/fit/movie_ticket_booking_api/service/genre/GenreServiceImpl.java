@@ -1,10 +1,11 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.genre;
 
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreCreate;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreSearchDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Genre;
@@ -14,7 +15,6 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.NotFoundException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.genre.GenreMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.genre.GenreCustomRepository;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +22,7 @@ import java.util.Optional;
 @Service
 public class GenreServiceImpl implements GenreService {
     private GenreCustomRepository genreCustomRepository;
+
     private GenreMapper genreMapper;
 
     @Autowired
@@ -38,6 +39,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @Transactional
     public GenreDto getGenre(Long id) throws BaseException{
         Optional<GenreDto> genreDto = Optional.ofNullable(
                 genreCustomRepository.getGenre(id).map(
@@ -51,15 +53,11 @@ public class GenreServiceImpl implements GenreService {
     @Override
     @Transactional
     public GenreDto createGenre(GenreDto genreDto) throws BaseException {
-        GenreDto dto = genreMapper.toGenreDto(
-                genreCustomRepository.save(
-                        genreMapper.toGenre(genreDto)
-                )
-        );
-        if (ObjectUtils.isEmpty(dto)) {
+        Genre genre = genreCustomRepository.saveAndFlush(genreMapper.toGenre(genreDto));
+        if (ObjectUtils.isEmpty(genre)) {
             throw new BadRequestException("Create genre failed");
         }
-        return dto;
+        return genreMapper.toGenreDto(genre);
     }
 
     @Override
@@ -71,13 +69,14 @@ public class GenreServiceImpl implements GenreService {
         genre.setState(ObjectState.DELETED);
         genre.setDeletedDate(ZonedDateTime.now());
 
-        if (ObjectUtils.isEmpty(genreCustomRepository.save(genre))) {
+        if (ObjectUtils.isEmpty(genreCustomRepository.saveAndFlush(genre))) {
             throw new BadRequestException("Delete genre failed");
         }
 
     }
 
     @Override
+    @Transactional
     public GenreDto updateGenre(GenreDto genreDto) throws BaseException {
         Genre genre = genreCustomRepository.getGenre(genreDto.getId()).orElseThrow(
                 () -> new NotFoundException("Genre not found")
