@@ -5,6 +5,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.BranchStatus;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.object_key.BaseObjectDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.room.RoomDto;
+
+import java.util.*;
 
 @Getter
 @Setter
@@ -18,4 +21,6 @@ public class BranchDto extends BaseObjectDto {
     protected String address;
 
     protected BranchStatus status;
+
+    protected List<RoomDto> rooms = new ArrayList<>();
 }

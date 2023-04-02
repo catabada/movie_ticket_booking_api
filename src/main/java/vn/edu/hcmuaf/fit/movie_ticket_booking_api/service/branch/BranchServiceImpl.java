@@ -2,6 +2,7 @@ package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.branch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.BranchStatus;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.branch.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Branch;
@@ -32,11 +33,11 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public BranchDto getBranchById(Long id) throws BaseException {
         Optional<Branch> branch = branchCustomRepository.findById(id);
-
-        return branchMapper.toBranchDto(branch.orElseThrow(() -> new NotFoundException("Branch not found")));
+        return branchMapper.toBranchDtoWithRooms(branch.orElseThrow(() -> new NotFoundException("Branch not found")));
     }
 
     @Override
+    @Transactional
     public BranchDto createBranch(BranchCreate branchCreate) throws BaseException {
 //        if (branchCreate.getBranch() == null) {
 //            throw new BaseException("Branch is null");
@@ -51,9 +52,9 @@ public class BranchServiceImpl implements BranchService {
 
         branchCreate.setStatus(BranchStatus.ACTIVE);
 
-        Branch newBranch = branchCustomRepository.save(branchMapper.toBranch(branchCreate));
+        Branch newBranch = branchCustomRepository.saveAndFlush(branchMapper.toBranch(branchCreate));
 
-        return branchMapper.toBranchDto(newBranch);
+        return branchMapper.toBranchDtoWithRooms(newBranch);
     }
 
     @Override

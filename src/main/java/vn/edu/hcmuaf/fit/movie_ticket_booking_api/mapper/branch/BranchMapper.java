@@ -1,20 +1,37 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.branch;
 
-import org.mapstruct.Builder;
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.branch.BranchDto;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Branch;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.room.RoomDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.seat.SeatDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.object_key.BaseObjectMapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
+@Mapper(componentModel = "spring")
 public interface BranchMapper extends BaseObjectMapper {
-    BranchDto toBranchDto(final Branch branch);
+    BranchMapper INSTANCE = Mappers.getMapper(BranchMapper.class);
 
-    Branch toBranch(final BranchDto branchDto);
+    @Named("toSeatDtoWithoutRoom")
+    @Mapping(target = "room", ignore = true)
+    SeatDto toSeatDtoWithoutRoom(Seat seat);
 
-    List<BranchDto> toBranchDtoList(final List<Branch> branchList);
+    @Named("toRoomDtoWithoutBranch")
+    @Mapping(target = "branch", ignore = true)
+    @Mapping(target = "seats", source = "seats", qualifiedByName = "toSeatDtoWithoutRoom")
+    RoomDto toRoomDtoWithoutBranch(Room room);
 
-    List<Branch> toBranchList(final List<BranchDto> branchDtoList);
+    @Named("toBranchDtoWithRooms")
+    @Mapping(target = "rooms", source = "rooms", qualifiedByName = "toRoomDtoWithoutBranch")
+    BranchDto toBranchDtoWithRooms(Branch branch);
+
+    BranchDto toBranchDto(Branch branch);
+
+    Branch toBranch(BranchDto branchDto);
+
+    List<BranchDto> toBranchDtoList(List<Branch> branchList);
+
+    List<Branch> toBranchList(List<BranchDto> branchDtoList);
 }
