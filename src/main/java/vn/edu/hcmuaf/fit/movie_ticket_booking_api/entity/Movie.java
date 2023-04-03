@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Movie extends BaseObject implements Serializable {
     @Column(name = "name")
     private String name;
@@ -58,5 +60,5 @@ public class Movie extends BaseObject implements Serializable {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
-    private Set<Genre> genres = new HashSet<>();
+    private List<Genre> genres;
 }

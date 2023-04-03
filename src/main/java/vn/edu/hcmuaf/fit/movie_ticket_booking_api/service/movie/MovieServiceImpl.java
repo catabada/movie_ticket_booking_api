@@ -1,4 +1,4 @@
-package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.moive;
+package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.movie;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +17,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.movie.MovieCustomRe
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.ChangeToSlug;
 
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class MovieServiceImpl implements MovieService {
@@ -94,7 +92,7 @@ public class MovieServiceImpl implements MovieService {
             throw new BadRequestException("Delete movie failed");
     }
 
-    private boolean checkGenreExisted(Set<GenreDto> genres) {
+    private boolean checkGenreExisted(List<GenreDto> genres) {
         for (GenreDto genre : genres) {
             if (!genreCustomRepository.getGenre(genre.getId()).isPresent()) {
                 return false;

@@ -1,8 +1,6 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.movie;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.QBean;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
@@ -85,28 +83,4 @@ public class MoviesCustomRepositoryImpl extends AbstractCustomRepository<Movie, 
                 .and(qMovie.genres.any().state.ne(ObjectState.DELETED));
     }
 
-    private QBean<Movie> buildBean() {
-        return Projections.bean(
-                Movie.class,
-                qMovie.id,
-                qMovie.name,
-                qMovie.storyLine,
-                qMovie.genres,
-                qMovie.actors,
-                qMovie.director,
-                qMovie.producer,
-                qMovie.imageUrl,
-                qMovie.trailerUrl,
-                qMovie.rating,
-                qMovie.slug,
-                qMovie.duration,
-                qMovie.movieFormats,
-                qMovie.movieState,
-                qMovie.releaseDate,
-                qMovie.state,
-                qMovie.createdDate,
-                qMovie.modifiedDate,
-                qMovie.deletedDate
-        );
-    }
 }

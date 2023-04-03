@@ -29,7 +29,7 @@ public class MovieDto extends BaseObjectDto {
     protected String storyLine;
     @NotNull
     protected String imageUrl;
-    protected Set<GenreDto> genres;
+    protected List<GenreDto> genres;
     @NotNull
     protected Double rating;
     protected String slug;
@@ -48,6 +48,6 @@ public class MovieDto extends BaseObjectDto {
     @NotNull
     protected MovieState movieState;
     @NotNull
-    protected Set<MovieFormat> movieFormats;
+    protected List<MovieFormat> movieFormats;
 
 }

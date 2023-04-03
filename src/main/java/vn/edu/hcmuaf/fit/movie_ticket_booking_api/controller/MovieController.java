@@ -11,7 +11,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieUpdateDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseSuccess;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.moive.MovieService;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.movie.MovieService;
 
 import java.util.List;
 
