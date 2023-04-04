@@ -24,10 +24,10 @@ public class BaseObject implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
-    @Column(name = "state", nullable = false)
+    @Column(name = "state")
     @Enumerated(EnumType.STRING)
     protected ObjectState state;
-    @Column(name = "created_date", nullable = false)
+    @Column(name = "created_date")
     @CurrentTimestamp
     protected ZonedDateTime createdDate;
     @Column(name = "modified_date")

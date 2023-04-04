@@ -11,7 +11,6 @@ import java.util.Date;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @SuperBuilder
 public class UserInfoDto extends BaseObjectDto {
     protected String fullName;
@@ -20,5 +19,14 @@ public class UserInfoDto extends BaseObjectDto {
     protected Boolean isMale;
     protected String avatar;
     protected Date dateOfBirth;
-    protected AppUserDto appUser;
+
+    public UserInfoDto() {
+        this.fullName = "";
+        this.firstName = "";
+        this.lastName = "";
+        this.isMale = true;
+        this.avatar = "";
+        this.dateOfBirth = new Date();
+    }
+
 }
