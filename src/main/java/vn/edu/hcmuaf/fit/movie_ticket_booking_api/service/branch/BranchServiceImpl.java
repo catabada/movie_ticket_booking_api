@@ -7,7 +7,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.BranchStatus;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.branch.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Branch;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.*;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.branch.BranchMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.BranchMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.branch.BranchCustomRepository;
 
 import java.util.List;
