@@ -1,4 +1,4 @@
-package vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.app_user;
+package vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper;
 
 import org.mapstruct.Mapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;

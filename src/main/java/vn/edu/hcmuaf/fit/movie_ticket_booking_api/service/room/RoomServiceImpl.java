@@ -7,8 +7,8 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoomState;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.room.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.*;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.branch.BranchMapper;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.room.RoomMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.BranchMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.RoomMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.branch.BranchCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.room.RoomCustomRepository;
 
@@ -50,6 +50,7 @@ public class RoomServiceImpl implements RoomService {
                 branchCustomRepository.findById(roomCreate.getBranch().getId())
                         .orElseThrow(() -> new BadRequestException("Branch not found"));
         roomCreate.setBranch(branchMapper.toBranchDto(branch));
+
 
         Room room = roomMapper.toRoom(roomCreate);
         room.setRoomState(RoomState.OCCUPIED);

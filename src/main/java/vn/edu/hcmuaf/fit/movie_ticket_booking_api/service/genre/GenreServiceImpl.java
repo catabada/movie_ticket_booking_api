@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreCreate;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreSearchDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Genre;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.NotFoundException;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.genre.GenreMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.MovieGenreMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.GenreMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.genre.GenreCustomRepository;
 
 import java.time.ZonedDateTime;
@@ -24,17 +24,20 @@ public class GenreServiceImpl implements GenreService {
     private GenreCustomRepository genreCustomRepository;
 
     private GenreMapper genreMapper;
+    private final MovieGenreMapper movieGenreMapper;
 
     @Autowired
-    public GenreServiceImpl(final GenreCustomRepository genreCustomRepository, final GenreMapper genreMapper) {
+    public GenreServiceImpl(final GenreCustomRepository genreCustomRepository, final GenreMapper genreMapper, final MovieGenreMapper movieGenreMapper) {
         this.genreCustomRepository = genreCustomRepository;
         this.genreMapper = genreMapper;
+        this.movieGenreMapper = movieGenreMapper;
+
     }
 
 
     @Override
     public List<GenreDto> getGenresSearch(GenreSearchDto search) {
-        List<GenreDto> genreDtoList = genreMapper.toGenreDtoList(genreCustomRepository.getGenresSearch(search));
+        List<GenreDto> genreDtoList = movieGenreMapper.toGenreDtoList(genreCustomRepository.getGenresSearch(search));
         return genreDtoList;
     }
 
@@ -43,7 +46,7 @@ public class GenreServiceImpl implements GenreService {
     public GenreDto getGenre(Long id) throws BaseException{
         Optional<GenreDto> genreDto = Optional.ofNullable(
                 genreCustomRepository.getGenre(id).map(
-                        genreMapper::toGenreDto).orElseThrow(
+                        movieGenreMapper::toGenreDto).orElseThrow(
                         () -> new BadRequestException("Genre not found")
                 )
         );
@@ -57,7 +60,7 @@ public class GenreServiceImpl implements GenreService {
         if (ObjectUtils.isEmpty(genre)) {
             throw new BadRequestException("Create genre failed");
         }
-        return genreMapper.toGenreDto(genre);
+        return movieGenreMapper.toGenreDto(genre);
     }
 
     @Override
@@ -84,6 +87,6 @@ public class GenreServiceImpl implements GenreService {
         if (ObjectUtils.isEmpty(genreCustomRepository.save(genreMapper.toGenre(genreDto)))) {
             throw new BadRequestException("Update genre failed");
         }
-        return genreMapper.toGenreDto(genre);
+        return movieGenreMapper.toGenreDto(genre);
     }
 }

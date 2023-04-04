@@ -4,11 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.UserRegisterDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.AppUser;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.app_user.AppUserMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.AppUserMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.app_user.AppUserCustomRepository;
 
 @Service

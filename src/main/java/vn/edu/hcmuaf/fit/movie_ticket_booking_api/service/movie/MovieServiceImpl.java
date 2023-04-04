@@ -11,7 +11,8 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieSearchDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Movie;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.movie.MovieMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.MovieGenreMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.MovieMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.genre.GenreCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.movie.MovieCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.ChangeToSlug;
@@ -24,17 +25,20 @@ public class MovieServiceImpl implements MovieService {
     private final MovieCustomRepository movieCustomRepository;
     private final GenreCustomRepository genreCustomRepository;
     private final MovieMapper movieMapper;
+    private final MovieGenreMapper movieGenreMapper;
 
     @Autowired
-    public MovieServiceImpl(final MovieCustomRepository movieCustomRepository, final GenreCustomRepository genreCustomRepository, final MovieMapper movieMapper) {
+    public MovieServiceImpl(final MovieCustomRepository movieCustomRepository,
+                            final GenreCustomRepository genreCustomRepository, final MovieMapper movieMapper, final MovieGenreMapper movieGenreMapper) {
         this.movieCustomRepository = movieCustomRepository;
         this.genreCustomRepository = genreCustomRepository;
         this.movieMapper = movieMapper;
+        this.movieGenreMapper = movieGenreMapper;
     }
 
     @Override
     public List<MovieDto> getMoviesSearch(MovieSearchDto search) {
-        return movieMapper.toMovieDtoList(movieCustomRepository.getMoviesSearch(search));
+        return movieGenreMapper.toMovieDtoList(movieCustomRepository.getMoviesSearch(search));
     }
 
     @Override
@@ -49,7 +53,7 @@ public class MovieServiceImpl implements MovieService {
 
         if (ObjectUtils.isEmpty(movie))
             throw new BadRequestException("Create movie failed");
-        return movieMapper.toMovieDto(movie);
+        return movieGenreMapper.toMovieDto(movie);
     }
 
     @Override
@@ -61,7 +65,7 @@ public class MovieServiceImpl implements MovieService {
         if (ObjectUtils.isEmpty(movieCustomRepository.saveAndFlush(movieMapper.toMovie(movieDto)))) {
             throw new BadRequestException("Update movie failed");
         }
-        return movieMapper.toMovieDto(movie);
+        return movieGenreMapper.toMovieDto(movie);
     }
 
     @Override
@@ -69,7 +73,7 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = movieCustomRepository.getMovie(id).orElseThrow(
                 () -> new BadRequestException("Movie not found")
         );
-        return movieMapper.toMovieDto(movie);
+        return movieGenreMapper.toMovieDto(movie);
     }
 
     @Override
@@ -77,7 +81,7 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = movieCustomRepository.getMovieBySlug(slug).orElseThrow(
                 () -> new BadRequestException("Movie not found")
         );
-        return movieMapper.toMovieDto(movie);
+        return movieGenreMapper.toMovieDto(movie);
     }
 
     @Override
