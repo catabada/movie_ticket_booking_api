@@ -23,6 +23,9 @@ public class VerificationToken extends BaseObject implements Serializable {
     @GeneratedValue(generator = "UUID")
     private UUID token;
 
+    @Column(name = "name")
+    private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser appUser;
@@ -34,7 +37,14 @@ public class VerificationToken extends BaseObject implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
     private ZonedDateTime lastSent;
 
+    @Column(name = "is_verified")
+    private Boolean isVerified;
+
     @Column(name = "verified_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
     private ZonedDateTime verifiedDate;
+
+    @Column(name = "expired_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
+    private ZonedDateTime expiredDate;
 }

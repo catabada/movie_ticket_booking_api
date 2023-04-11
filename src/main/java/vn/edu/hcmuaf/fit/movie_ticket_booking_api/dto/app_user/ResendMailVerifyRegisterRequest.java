@@ -9,6 +9,6 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class UserRegisterResponseDto {
+public class ResendMailVerifyRegisterRequest {
     private String email;
 }

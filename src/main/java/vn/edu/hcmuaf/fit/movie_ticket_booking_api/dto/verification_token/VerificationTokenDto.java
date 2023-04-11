@@ -16,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class VerificationTokenDto extends BaseObjectDto {
     protected UUID token;
+    protected String name;
     protected AppUserDto appUser;
     protected Boolean isSent;
     protected ZonedDateTime lastSent;

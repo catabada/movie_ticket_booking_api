@@ -12,8 +12,11 @@ import java.util.Map;
 public interface AppMailService {
 
     @Async("threadPoolTaskExecutorForVerifyEmail")
-    Boolean sendVerifyEmailRegister(AppUserDto dto) throws MessagingException, IOException, BadRequestException;
+    void sendVerifyEmailRegister(AppUserDto dto) throws MessagingException, IOException, BadRequestException;
 
-    Boolean resendMailVerify(AppUserDto appUser);
-    Boolean sendMailResetPassword(String email, String newPassword);
+    @Async("threadPoolTaskExecutorResendMail")
+    void resendEmailVerifyRegister(AppUserDto appUser) throws MessagingException, BadRequestException, IOException;
+
+    @Async("threadPoolTaskExecutorForVerifyEmailResetPassword")
+    void sendVerifyMailResetPassword(AppUserDto dto) throws MessagingException, IOException, BadRequestException;
 }

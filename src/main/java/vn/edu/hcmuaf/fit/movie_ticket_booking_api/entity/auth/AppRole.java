@@ -9,6 +9,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.BaseObject;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "app_role")
@@ -20,6 +21,6 @@ public class AppRole extends BaseObject implements Serializable {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-//    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "appRoles")
-//    private List<AppUser> appUsers;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "appRoles")
+    private Set<AppUser> appUsers;
 }

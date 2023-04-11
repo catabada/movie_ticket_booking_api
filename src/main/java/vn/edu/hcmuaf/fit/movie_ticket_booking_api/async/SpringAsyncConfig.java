@@ -9,11 +9,29 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 @EnableAsync
 public class SpringAsyncConfig {
-    @Bean(name = "threadPoolTaskExecutorForVerifyEmail")
-    public TaskExecutor getTaskExecutor() {
+    @Bean(name = "threadPoolTaskExecutorForVerifyEmailRegister")
+    public TaskExecutor getTaskExecutorForVerifyEmailRegister() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setCorePoolSize(2);
         threadPoolTaskExecutor.setMaxPoolSize(10);
         return threadPoolTaskExecutor;
     }
+
+    @Bean(name = "threadPoolTaskExecutorForVerifyEmailResetPassword")
+    public TaskExecutor getTaskExecutorForVerifyEmailResetPassword() {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        threadPoolTaskExecutor.setCorePoolSize(2);
+        threadPoolTaskExecutor.setMaxPoolSize(10);
+        return threadPoolTaskExecutor;
+    }
+
+    @Bean(name = "threadPoolTaskExecutorResendEmail")
+    public TaskExecutor getTaskExecutorForResendEmail() {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        threadPoolTaskExecutor.setCorePoolSize(2);
+        threadPoolTaskExecutor.setMaxPoolSize(10);
+        return threadPoolTaskExecutor;
+    }
+
+
 }

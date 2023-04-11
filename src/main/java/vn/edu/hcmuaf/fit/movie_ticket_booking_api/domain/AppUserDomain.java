@@ -1,16 +1,22 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.domain;
 
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.BeanIdConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.AppUser;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.infrastructure.AppJwtTokenProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 @NoArgsConstructor
+
 public class AppUserDomain implements UserDetails {
     private AppUser appUser;
 
@@ -39,7 +45,7 @@ public class AppUserDomain implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
@@ -49,7 +55,7 @@ public class AppUserDomain implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     public String getEmail() {
@@ -58,7 +64,7 @@ public class AppUserDomain implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return appUser.getEnabled();
     }
 
     public Long getUserId() {
