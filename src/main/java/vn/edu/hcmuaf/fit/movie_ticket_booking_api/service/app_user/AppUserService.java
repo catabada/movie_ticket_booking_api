@@ -18,7 +18,7 @@ public interface AppUserService extends UserDetailsService {
 
     void updateProfile(final UserInfoUpdate userInfoUpdate) throws BaseException;
 
-    UserInfoDto getProfile(final Long id) throws BaseException;
+    UserInfoDto getProfile() throws BaseException;
 
     void changePassword(final ChangePasswordRequest changePasswordRequest) throws BaseException;
 

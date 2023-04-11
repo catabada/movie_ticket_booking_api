@@ -23,56 +23,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    @Value("${app.config.url.reset-password}")
-    private String urlVerifySuccess;
     private final AppUserService appUserService;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
     public UserController(AppUserService appUserService, AuthenticationManager authenticationManager) {
         this.appUserService = appUserService;
-        this.authenticationManager = authenticationManager;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<HttpResponse> register(@RequestBody UserRegisterDto register) throws BaseException {
-        appUserService.register(register.getUserRegister());
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
-    }
 
-    @GetMapping("/verify-email/{token}")
-    public ResponseEntity<HttpResponse> verifyEmail(@PathVariable String token) throws BaseException {
-        appUserService.verifyEmail(token);
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<HttpResponse> login(@RequestBody UserLoginRequest loginRequest) throws BaseException {
-        UserLoginResponse result = appUserService.login(loginRequest);
-        if (!ObjectUtils.isEmpty(result)) {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getEmail(),
-                            loginRequest.getPassword()
-                    )
-            );
-        }
-        return ResponseEntity.ok(HttpResponseSuccess.success(result).build());
-    }
-
-    @PostMapping("/resend-email/register")
-    public ResponseEntity<HttpResponse> resendEmailVerifyRegister(@RequestBody ResendMailVerifyRegisterRequest resendMailVerifyRegisterRequest) throws BaseException {
-        appUserService.resendEmailVerifyRegister(resendMailVerifyRegisterRequest.getEmail());
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
-    }
-
-    @GetMapping("/profile/{id}")
-    public ResponseEntity<HttpResponse> getProfile(@PathVariable Long id) throws BaseException {
-        return ResponseEntity.ok(HttpResponseSuccess.success(appUserService.getProfile(id)).build());
+    @GetMapping("/profile")
+    public ResponseEntity<HttpResponse> getProfile() throws BaseException {
+        return ResponseEntity.ok(HttpResponseSuccess.success(appUserService.getProfile()).build());
     }
 
     @PutMapping("/profile")
@@ -88,29 +55,12 @@ public class UserController {
         return ResponseEntity.ok(HttpResponseSuccess.success().build());
     }
 
-    @PostMapping("/forgot-password")
-    public ResponseEntity<HttpResponse> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws BaseException {
-        appUserService.forgotPassword(forgotPasswordRequest);
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
-    }
-
-    @GetMapping("/verify-reset-password/{token}")
-    public ResponseEntity<HttpResponse> verifyResetPassword(@PathVariable String token) throws BaseException {
-        appUserService.verifyEmailResetPassword(token);
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(urlVerifySuccess + token)).build();
-    }
-
-    @PutMapping("/reset-password")
-    public ResponseEntity<HttpResponse> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) throws BaseException {
-        appUserService.resetPassword(resetPasswordRequest);
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
-    }
-
     @PutMapping("/upload-avatar")
     public ResponseEntity<HttpResponse> uploadAvatar(@RequestParam("avatar") MultipartFile file) throws BaseException {
         appUserService.uploadAvatar(file);
         return ResponseEntity.ok(HttpResponseSuccess.success().build());
     }
+
     @GetMapping(path = "/image/profile/{username}", produces = IMAGE_JPEG_VALUE)
     public byte[] getTempProfileImage(@PathVariable("username") String username) throws IOException, IOException {
         URL url = new URL(FileConstant.TEMP_PROFILE_IMAGE_BASE_URL + username);

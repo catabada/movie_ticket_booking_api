@@ -1,4 +1,4 @@
-package vn.edu.hcmuaf.fit.movie_ticket_booking_api.async;
+package vn.edu.hcmuaf.fit.movie_ticket_booking_api.config.async;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

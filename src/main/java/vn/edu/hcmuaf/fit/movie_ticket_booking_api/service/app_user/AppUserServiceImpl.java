@@ -200,15 +200,12 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public UserInfoDto getProfile(Long id) throws BaseException {
+    public UserInfoDto getProfile() throws BaseException {
+        String email = AppUtils.getCurrentEmail();
+        if (ObjectUtils.isEmpty(email)) throw new BadRequestException("You should login");
+        Optional<AppUser> optional = appUserCustomRepository.getUserByEmail(email);
 
-        Optional<AppUser> optional = appUserCustomRepository.getUserProfile(id);
-        if (optional.isEmpty()) {
-            throw new BadRequestException("User not found: " + id);
-        }
-        if (!AppUtils.getCurrentEmail().equals(optional.get().getEmail()))
-            throw new BadRequestException("You should login to get profile");
-
+        if (optional.isEmpty()) throw new BadRequestException("Not found user: " + email);
         AppUser appUser = optional.get();
 
         if (!appUser.getAccountNonLocked()) {
