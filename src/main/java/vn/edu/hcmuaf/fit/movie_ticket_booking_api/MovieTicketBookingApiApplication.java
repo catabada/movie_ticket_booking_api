@@ -28,8 +28,13 @@ public class MovieTicketBookingApiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MovieTicketBookingApiApplication.class, args);
-		appRoleRepository.save(AppRole.builder().name(RoleConstant.ROLE_MEMBER).build());
-		appRoleRepository.save(AppRole.builder().name(RoleConstant.ROLE_ADMIN).build());
+//		appRoleRepository.save(AppRole.builder().name(RoleConstant.ROLE_MEMBER).build());
+//		appRoleRepository.save(AppRole.builder().name(RoleConstant.ROLE_ADMIN).build());
+	}
+
+	@Bean
+	public HttpMessageConverter<BufferedImage> createImageHttpMessageConverter() {
+		return new BufferedImageHttpMessageConverter();
 	}
 
 	@Bean

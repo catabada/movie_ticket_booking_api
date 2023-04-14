@@ -5,33 +5,38 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.TicketStatus;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.*;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Ticket;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.TicketMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.seat.SeatCustomRepository;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.showtime.ShowtimeCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.ticket.TicketCustomRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class TicketServiceImpl implements TicketService {
     private final TicketCustomRepository ticketCustomRepository;
+    private final ShowtimeCustomRepository showtimeCustomRepository;
+    private final SeatCustomRepository seatCustomRepository;
     private final TicketMapper ticketMapper;
 
     @Autowired
-    public TicketServiceImpl(TicketCustomRepository ticketCustomRepository, TicketMapper ticketMapper) {
+    public TicketServiceImpl(TicketCustomRepository ticketCustomRepository, ShowtimeCustomRepository showtimeCustomRepository, SeatCustomRepository seatCustomRepository, TicketMapper ticketMapper) {
         this.ticketCustomRepository = ticketCustomRepository;
+        this.showtimeCustomRepository = showtimeCustomRepository;
+        this.seatCustomRepository = seatCustomRepository;
         this.ticketMapper = ticketMapper;
     }
 
     @Override
-    @Transactional
     public List<TicketDto> searchTicket(TicketSearch ticketSearch) throws Exception {
         return ticketMapper.toTicketDtoList(ticketCustomRepository.searchTicket(ticketSearch));
     }
 
     @Override
-    @Transactional
     public TicketInfoDto getTicketInfo(Long id) throws Exception {
         Optional<Ticket> ticket = ticketCustomRepository.findById(id);
 
@@ -46,13 +51,23 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public TicketDto bookingTicket(TicketCreate ticketCreate) throws Exception {
         Ticket ticket = ticketMapper.toTicket(ticketCreate);
+
+        Showtime showtime = showtimeCustomRepository.findById(ticketCreate.getShowtime().getId())
+                .orElseThrow(() -> new BadRequestException("Showtime not found"));
+        ticket.setShowtime(showtime);
+
+        Seat seat = seatCustomRepository.findById(ticketCreate.getSeat().getId())
+                .orElseThrow(() -> new BadRequestException("Seat not found"));
+        ticket.setSeat(seat);
+
         ticket.setCode("123456");
         ticket.setStatus(TicketStatus.BOOKED);
-        return ticketMapper.toTicketDto(ticketCustomRepository.save(ticket));
+
+        Ticket newTicket = ticketCustomRepository.save(ticket);
+        return ticketMapper.toTicketDto(newTicket);
     }
 
     @Override
-    @Transactional
     public TicketDto updateTicket(TicketUpdate ticketUpdate) throws Exception {
         return null;
     }

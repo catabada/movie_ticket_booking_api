@@ -12,16 +12,18 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.VerificationConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.TicketDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.VerificationToken;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.infrastructure.AppMailSender;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.AppUserMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.verification_token.VerificationTokenCustomRepository;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.AppUtils;
 
-import java.io.IOException;
+import java.io.*;
 import java.time.ZonedDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -112,6 +114,30 @@ public class AppMailServiceImpl implements AppMailService {
         Boolean success = sendVerifyMailResetPassword(dto.getEmail(), verificationToken.getToken().toString());
 
         if (!success) throw new BadRequestException("Send verify email to reset password failed");
+    }
+
+    @Override
+    @Async("threadPoolTaskExecutorForSendEmailBookingTicket")
+    public void sendEmailBookingTicket(String email, TicketDto ticket) throws MessagingException,
+            IOException, BadRequestException {
+        try {
+            byte[] imageInBytes = AppUtils.generateQRCodeImage(ticket.getCode());
+
+            Context context = new Context();
+//            context.setVariable("email", email);
+            context.setVariable("code", ticket.getCode());
+            context.setVariable("movieName", ticket.getShowtime().getMovie().getName());
+            context.setVariable("showTime", ticket.getShowtime().getStartTime().format(DateTimeFormatter.ofPattern("HH:mm, dd-MM-yyyy")));
+            context.setVariable("room", ticket.getShowtime().getRoom().getName());
+            context.setVariable("branch", ticket.getShowtime().getRoom().getBranch().getName());
+            context.setVariable("seat", ticket.getSeat().getCode());
+            String html = templateEngine.process("booking_result", context);
+
+            appMailSender.sendEmailWithImageInlined(username, email, html, "Booking ticket", true, imageInBytes);
+        } catch (Exception e) {
+            log.error("Send email booking ticket failed: " + e.getMessage());
+            throw new BadRequestException("Send email booking ticket failed");
+        }
     }
 
 

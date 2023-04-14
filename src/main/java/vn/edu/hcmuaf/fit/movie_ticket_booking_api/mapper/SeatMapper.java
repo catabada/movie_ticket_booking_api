@@ -6,10 +6,11 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Seat;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
+@Mapper(componentModel = "spring")
 public interface SeatMapper {
 
     @Named("toSeatDto")
+    @Mapping(target = "room.seats", ignore = true)
     SeatDto toSeatDto(final Seat seat);
 
     @Named("toSeatDtoWithoutRoom")

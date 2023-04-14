@@ -17,11 +17,11 @@ public class Ticket extends BaseObject {
     @Column(name = "code", nullable = false)
     private String code;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "showtime_id", nullable = false)
     private Showtime showtime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "seat_id", nullable = false)
     private Seat seat;
 

@@ -19,6 +19,7 @@ public class TicketDto extends BaseObjectDto {
     @JsonIgnoreProperties("tickets")
     private ShowtimeDto showtime;
 
+    @JsonIgnoreProperties("room")
     private SeatDto seat;
 
     private TicketStatus status;

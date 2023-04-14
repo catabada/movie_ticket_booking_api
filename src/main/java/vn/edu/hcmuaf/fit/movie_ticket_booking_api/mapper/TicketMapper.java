@@ -7,11 +7,11 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Ticket;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
+@Mapper(
+        componentModel = "spring",
+        uses = {ShowtimeMapper.class, SeatMapper.class}
+)
 public interface TicketMapper {
-
-    @Named("toTicketDto")
-    TicketDto toTicketDto(final Ticket ticket);
 
     @Named("toTicketInfoDto")
     @Mapping(target = "showtime", source = "showtime.startTime")
@@ -20,8 +20,14 @@ public interface TicketMapper {
     @Mapping(target = "seat", source = "seat.code")
     TicketInfoDto toTicketInfoDto(final Ticket ticket);
 
+    @Named("toTicketDto")
+    @Mapping(target = "seat", source = "seat", qualifiedByName = "toSeatDtoWithoutRoom")
+    @Mapping(target = "showtime", source = "showtime", qualifiedByName = "toShowtimeDtoWithoutTickets")
+    TicketDto toTicketDto(final Ticket ticket);
+
     @Named("toTicketDtoWithoutShowtime")
     @Mapping(target = "showtime", ignore = true)
+    @Mapping(target = "seat", source = "seat", qualifiedByName = "toSeatDtoWithoutRoom")
     TicketDto toTicketDtoWithoutShowtime(final Ticket ticket);
 
     Ticket toTicket(final TicketDto ticketDto);
