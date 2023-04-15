@@ -1,12 +1,10 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.*;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.app_mail.AppMailService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.ticket.TicketService;
 
 import java.util.List;
@@ -15,12 +13,10 @@ import java.util.List;
 @RequestMapping("/ticket")
 public class TicketController {
     private final TicketService ticketService;
-    private final AppMailService appMailService;
 
     @Autowired
-    public TicketController(TicketService ticketService, AppMailService appMailService) {
+    public TicketController(TicketService ticketService) {
         this.ticketService = ticketService;
-        this.appMailService = appMailService;
     }
 
     @RequestMapping("/search")
@@ -38,8 +34,6 @@ public class TicketController {
     @PostMapping("/booking")
     public ResponseEntity<HttpResponse> bookingTicket(@RequestBody TicketCreate ticketCreate) throws Exception {
         TicketDto ticketDto = ticketService.bookingTicket(ticketCreate);
-        appMailService.sendEmailBookingTicket(ticketCreate.getEmail(), ticketDto);
-
         return ResponseEntity.ok(HttpResponseSuccess.success(ticketDto).build());
     }
 

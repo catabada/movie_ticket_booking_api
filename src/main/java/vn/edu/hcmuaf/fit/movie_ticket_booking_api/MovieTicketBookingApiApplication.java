@@ -9,8 +9,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoleConstant;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.AppRole;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.app_role.AppRoleRepository;
 
 import java.util.Arrays;
@@ -30,11 +28,6 @@ public class MovieTicketBookingApiApplication {
 		SpringApplication.run(MovieTicketBookingApiApplication.class, args);
 //		appRoleRepository.save(AppRole.builder().name(RoleConstant.ROLE_MEMBER).build());
 //		appRoleRepository.save(AppRole.builder().name(RoleConstant.ROLE_ADMIN).build());
-	}
-
-	@Bean
-	public HttpMessageConverter<BufferedImage> createImageHttpMessageConverter() {
-		return new BufferedImageHttpMessageConverter();
 	}
 
 	@Bean

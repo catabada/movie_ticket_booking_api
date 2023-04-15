@@ -10,7 +10,6 @@ import java.time.ZonedDateTime;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 public class TicketInfoDto {
 
     private String code;
@@ -23,6 +22,4 @@ public class TicketInfoDto {
     private String room;
 
     private String seat;
-
-    private String status;
 }

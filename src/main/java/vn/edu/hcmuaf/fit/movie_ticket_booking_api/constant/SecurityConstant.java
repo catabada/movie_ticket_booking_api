@@ -16,6 +16,7 @@ public class SecurityConstant {
             "/user/image/**", "/user/image/**", "/auth/forgot-password/**",
             "/checkout/**",
             "/swagger-ui/**", "/webjars/**", "/v3/**", "/swagger-resources/**",
+            "/ticket/booking", "/showtime/**", "/**",
     };
 
     public final static String[] PUBLIC_GET_URLS = {

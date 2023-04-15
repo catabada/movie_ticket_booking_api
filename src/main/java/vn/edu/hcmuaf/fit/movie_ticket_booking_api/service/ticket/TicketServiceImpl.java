@@ -3,13 +3,11 @@ package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.ticket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.TicketStatus;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.TicketMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.seat.SeatCustomRepository;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.showtime.ShowtimeCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.ticket.TicketCustomRepository;
 
 import java.util.List;
@@ -19,14 +17,12 @@ import java.util.Optional;
 @Transactional
 public class TicketServiceImpl implements TicketService {
     private final TicketCustomRepository ticketCustomRepository;
-    private final ShowtimeCustomRepository showtimeCustomRepository;
     private final SeatCustomRepository seatCustomRepository;
     private final TicketMapper ticketMapper;
 
     @Autowired
-    public TicketServiceImpl(TicketCustomRepository ticketCustomRepository, ShowtimeCustomRepository showtimeCustomRepository, SeatCustomRepository seatCustomRepository, TicketMapper ticketMapper) {
+    public TicketServiceImpl(TicketCustomRepository ticketCustomRepository, SeatCustomRepository seatCustomRepository, TicketMapper ticketMapper) {
         this.ticketCustomRepository = ticketCustomRepository;
-        this.showtimeCustomRepository = showtimeCustomRepository;
         this.seatCustomRepository = seatCustomRepository;
         this.ticketMapper = ticketMapper;
     }
@@ -52,16 +48,9 @@ public class TicketServiceImpl implements TicketService {
     public TicketDto bookingTicket(TicketCreate ticketCreate) throws Exception {
         Ticket ticket = ticketMapper.toTicket(ticketCreate);
 
-        Showtime showtime = showtimeCustomRepository.findById(ticketCreate.getShowtime().getId())
-                .orElseThrow(() -> new BadRequestException("Showtime not found"));
-        ticket.setShowtime(showtime);
-
         Seat seat = seatCustomRepository.findById(ticketCreate.getSeat().getId())
                 .orElseThrow(() -> new BadRequestException("Seat not found"));
         ticket.setSeat(seat);
-
-        ticket.setCode("123456");
-        ticket.setStatus(TicketStatus.BOOKED);
 
         Ticket newTicket = ticketCustomRepository.save(ticket);
         return ticketMapper.toTicketDto(newTicket);

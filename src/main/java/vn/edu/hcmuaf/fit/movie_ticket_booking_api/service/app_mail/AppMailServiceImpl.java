@@ -12,7 +12,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.VerificationConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.TicketDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.VerificationToken;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.infrastructure.AppMailSender;
@@ -24,6 +24,7 @@ import java.io.*;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -40,9 +41,9 @@ public class AppMailServiceImpl implements AppMailService {
     @Value("${app.config.url.login}")
     private String loginLink;
 
-    private SpringTemplateEngine templateEngine;
+    private final SpringTemplateEngine templateEngine;
 
-    private AppMailSender appMailSender;
+    private final AppMailSender appMailSender;
     private final VerificationTokenCustomRepository verificationTokenCustomRepository;
 
     private final AppUserMapper appUserMapper;
@@ -72,7 +73,7 @@ public class AppMailServiceImpl implements AppMailService {
 
         verificationTokenCustomRepository.saveAndFlush(token);
 
-        Boolean success = sendVerifyEmailRegister(dto.getEmail(), token.getToken().toString());
+        boolean success = sendVerifyEmailRegister(dto.getEmail(), token.getToken().toString());
 
         if (!success) throw new BadRequestException("Send verify email failed");
     }
@@ -111,26 +112,25 @@ public class AppMailServiceImpl implements AppMailService {
                 .build();
 
         verificationTokenCustomRepository.saveAndFlush(verificationToken);
-        Boolean success = sendVerifyMailResetPassword(dto.getEmail(), verificationToken.getToken().toString());
+        boolean success = sendVerifyMailResetPassword(dto.getEmail(), verificationToken.getToken().toString());
 
         if (!success) throw new BadRequestException("Send verify email to reset password failed");
     }
 
     @Override
     @Async("threadPoolTaskExecutorForSendEmailBookingTicket")
-    public void sendEmailBookingTicket(String email, TicketDto ticket) throws MessagingException,
-            IOException, BadRequestException {
+    public void sendEmailBookingTicket(String email, InvoiceDto invoice) throws
+            BadRequestException {
         try {
-            byte[] imageInBytes = AppUtils.generateQRCodeImage(ticket.getCode());
+            byte[] imageInBytes = AppUtils.generateQRCodeImage(invoice.getCode());
 
             Context context = new Context();
-//            context.setVariable("email", email);
-            context.setVariable("code", ticket.getCode());
-            context.setVariable("movieName", ticket.getShowtime().getMovie().getName());
-            context.setVariable("showTime", ticket.getShowtime().getStartTime().format(DateTimeFormatter.ofPattern("HH:mm, dd-MM-yyyy")));
-            context.setVariable("room", ticket.getShowtime().getRoom().getName());
-            context.setVariable("branch", ticket.getShowtime().getRoom().getBranch().getName());
-            context.setVariable("seat", ticket.getSeat().getCode());
+            context.setVariable("code", invoice.getCode());
+            context.setVariable("movieName", invoice.getShowtime().getMovie().getName());
+            context.setVariable("showTime", invoice.getShowtime().getStartTime().format(DateTimeFormatter.ofPattern("HH:mm, dd-MM-yyyy")));
+            context.setVariable("room", invoice.getShowtime().getRoom().getName());
+            context.setVariable("branch", invoice.getShowtime().getRoom().getBranch().getName());
+            context.setVariable("seats", invoice.getTickets().stream().map(ticket -> ticket.getSeat().getCode()).collect(Collectors.joining(", ")));
             String html = templateEngine.process("booking_result", context);
 
             appMailSender.sendEmailWithImageInlined(username, email, html, "Booking ticket", true, imageInBytes);

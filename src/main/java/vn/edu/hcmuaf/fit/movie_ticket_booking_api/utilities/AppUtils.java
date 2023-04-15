@@ -36,4 +36,8 @@ public class AppUtils {
         baos.close();
         return imageBytes;
     }
+
+    public static String createInvoiceCode() {
+        return "INV-" + System.currentTimeMillis();
+    }
 }

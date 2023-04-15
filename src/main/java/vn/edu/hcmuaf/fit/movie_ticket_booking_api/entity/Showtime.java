@@ -16,11 +16,11 @@ import java.util.List;
 @AllArgsConstructor
 public class Showtime extends BaseObject {
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
     private Movie movie;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private Room room;
 
@@ -34,5 +34,5 @@ public class Showtime extends BaseObject {
     private ZonedDateTime endTime;
 
     @OneToMany(mappedBy = "showtime")
-    private List<Ticket> tickets;
+    List<Invoice> invoices;
 }
