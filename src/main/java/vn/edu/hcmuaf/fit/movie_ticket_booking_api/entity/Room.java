@@ -15,13 +15,11 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Room extends BaseObject {
-    @Column(name = "name", nullable = false)
+    @Column(nullable = false)
     private String name;
 
-    @Column(name = "total_seat", nullable = false)
-    private int totalSeat;
-
-    @Column(name = "room_state")
+    @Column(name="room_state", nullable = false)
+    @Enumerated(EnumType.STRING)
     private RoomState roomState;
 
     @ManyToOne(fetch = FetchType.LAZY)

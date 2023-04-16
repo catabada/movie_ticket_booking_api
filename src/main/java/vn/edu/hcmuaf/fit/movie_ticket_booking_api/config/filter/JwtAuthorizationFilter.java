@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.SecurityConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.infrastructure.AppJwtTokenProvider;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.app_user.AppUserService;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,12 +22,10 @@ import java.util.List;
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final AppJwtTokenProvider jwtTokenProvider;
-    private final AppUserService appUserService;
 
     @Autowired
-    public JwtAuthorizationFilter(AppJwtTokenProvider jwtTokenProvider, AppUserService appUserService) {
+    public JwtAuthorizationFilter(AppJwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.appUserService = appUserService;
     }
 
     @Override
