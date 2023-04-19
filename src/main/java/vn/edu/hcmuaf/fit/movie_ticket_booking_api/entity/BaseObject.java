@@ -27,10 +27,10 @@ public class BaseObject implements Serializable {
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     protected ObjectState state;
-    @Column(name = "created_date")
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CurrentTimestamp
     protected ZonedDateTime createdDate;
-    @Column(name = "modified_date")
+    @Column(name = "modified_date", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @UpdateTimestamp
     protected ZonedDateTime modifiedDate;
     @Column(name = "deleted_date")

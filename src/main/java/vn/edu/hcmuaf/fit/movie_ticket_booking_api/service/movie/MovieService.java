@@ -1,9 +1,11 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.movie;
 
+import org.springframework.web.multipart.MultipartFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieSearchDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface MovieService {

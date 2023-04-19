@@ -13,5 +13,7 @@ public interface MovieCustomRepository extends ICustomRepository<Movie, Long> {
     Optional<Movie> getMovie(Long id);
 
     Optional<Movie> getMovieBySlug(String slug);
+
+    Optional<Movie> getMovieByName(String name);
     List<Movie> getMoviesSearch(MovieSearchDto search);
 }

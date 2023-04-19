@@ -19,17 +19,8 @@ import java.util.Arrays;
 @Slf4j
 @EnableAsync
 public class MovieTicketBookingApiApplication {
-	private static AppRoleRepository appRoleRepository;
-
-	@Autowired
-	public void setAppRoleRepository(AppRoleRepository appRoleRepository) {
-		MovieTicketBookingApiApplication.appRoleRepository = appRoleRepository;
-	}
-
 	public static void main(String[] args) {
 		SpringApplication.run(MovieTicketBookingApiApplication.class, args);
-		appRoleRepository.save(AppRole.builder().name(RoleConstant.ROLE_MEMBER).build());
-		appRoleRepository.save(AppRole.builder().name(RoleConstant.ROLE_ADMIN).build());
 	}
 
 	@Bean

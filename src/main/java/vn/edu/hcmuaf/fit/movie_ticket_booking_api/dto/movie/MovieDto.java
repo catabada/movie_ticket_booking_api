@@ -1,9 +1,7 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,11 +10,9 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.MovieFormat;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.MovieState;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.object_key.BaseObjectDto;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Genre;
 
-import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @SuperBuilder
 @Getter
@@ -27,14 +23,18 @@ public class MovieDto extends BaseObjectDto {
     protected String name;
     @NotNull
     protected String storyLine;
-    @NotNull
-    protected String imageUrl;
+    protected String imageVertical;
+    protected String imageHorizontal;
+
     protected List<GenreDto> genres;
     @NotNull
     protected Double rating;
     protected String slug;
     @NotNull
     protected Integer duration;
+    private String language;
+    private String subtitle;
+    private String country;
     @NotNull
     protected String trailerUrl;
     @NotNull
@@ -44,7 +44,8 @@ public class MovieDto extends BaseObjectDto {
     @NotNull
     protected String producer;
     @NotNull
-    protected String releaseDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone = "Asia/Ho_Chi_Minh")
+    protected Date releaseDate;
     @NotNull
     protected MovieState movieState;
     @NotNull

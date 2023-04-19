@@ -10,6 +10,7 @@ public class SecurityConstant {
     //10 days
     public final static long EXPIRATION_TIME = 864000000L;
     public final static String[] PUBLIC_URLS = {
+            "/**",
             "/auth/resend-email/**",
             "/auth/register", "/auth/login", "/auth/login-facebook", "/auth/login-google",
             "/auth/verify-email/**",  "/user/image/profile/**",

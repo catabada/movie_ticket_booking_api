@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieCreateDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieSearchDto;
@@ -13,10 +14,12 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseSuccess;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.movie.MovieService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/movie")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MovieController {
     private final MovieService movieService;
 
@@ -48,6 +51,15 @@ public class MovieController {
         MovieDto dto = movieService.createMovie(create.getMovie());
         return ResponseEntity.ok().body(HttpResponseSuccess.success(dto).build());
     }
+//    @PostMapping(value="/create", consumes = { "multipart/form-data"})
+//    public ResponseEntity<HttpResponse> createMovie(
+//            @RequestPart("imageVertical") MultipartFile imageVertical,
+//            @RequestPart("imageHorizontal") MultipartFile imageHorizontal,
+//            @RequestPart("create") @Valid MovieCreateDto create
+//    ) throws BaseException, IOException {
+//        MovieDto dto = movieService.createMovie(create.getMovie(), imageVertical, imageHorizontal);
+//        return ResponseEntity.ok().body(HttpResponseSuccess.success(dto).build());
+//    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<HttpResponse> deleteMovie(@PathVariable Long id) throws BaseException {

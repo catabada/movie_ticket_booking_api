@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.FileConstant;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.UploadFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.UnsupportedFileTypeException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.entity.MediaFile;
@@ -25,14 +26,14 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class ImageFileService implements FileService {
     private final String imageExtensionSave = ".jpg";
 
-    private final String[] mimeTypeSupport = {MimeTypeUtils.IMAGE_JPEG_VALUE, MimeTypeUtils.IMAGE_PNG_VALUE};
+    private final String[] mimeTypeSupport = {MimeTypeUtils.IMAGE_JPEG_VALUE, MimeTypeUtils.IMAGE_PNG_VALUE, "image/jpg"};
 
     @Override
-    public MediaFile uploadFile(String fileName, MultipartFile file) throws UnsupportedFileTypeException, IOException {
+    public MediaFile uploadFile(String fileName, MultipartFile file, UploadFile uploadFile) throws UnsupportedFileTypeException, IOException {
         if (!Arrays.asList(mimeTypeSupport).contains(file.getContentType()))
             throw new UnsupportedFileTypeException(
                     file.getOriginalFilename() + " is not an image file: [" + String.join("; ", mimeTypeSupport) + "]");
-        Path imageFolder = Paths.get(FileConstant.IMAGE_FOLDER).toAbsolutePath().normalize();
+        Path imageFolder = Paths.get(FileConstant.IMAGE_FOLDER + uploadFile.getPathFolder()).toAbsolutePath().normalize();
 
         if (!imageFolder.toFile().exists())
             Files.createDirectories(imageFolder);

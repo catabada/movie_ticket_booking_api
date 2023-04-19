@@ -4,7 +4,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.UploadFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.genre.GenreDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieSearchDto;
@@ -14,10 +16,14 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.MovieGenreMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.MovieMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.entity.MediaFile;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.service.FileService;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.service.image.ImageFileService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.genre.GenreCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.movie.MovieCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.ChangeToSlug;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -27,13 +33,19 @@ public class MovieServiceImpl implements MovieService {
     private final GenreCustomRepository genreCustomRepository;
     private final MovieGenreMapper movieGenreMapper;
     private final MovieMapper movieMapper;
+//    private final FileService fileService;
 
     @Autowired
-    public MovieServiceImpl(final MovieCustomRepository movieCustomRepository, final GenreCustomRepository genreCustomRepository, MovieGenreMapper movieGenreMapper, final MovieMapper movieMapper) {
+    public MovieServiceImpl(final MovieCustomRepository movieCustomRepository,
+                            final GenreCustomRepository genreCustomRepository,
+                            MovieGenreMapper movieGenreMapper,
+                            final MovieMapper movieMapper,
+                            ImageFileService fileService) {
         this.movieCustomRepository = movieCustomRepository;
         this.genreCustomRepository = genreCustomRepository;
         this.movieGenreMapper = movieGenreMapper;
         this.movieMapper = movieMapper;
+//        this.fileService = fileService;
     }
 
     @Override
@@ -47,12 +59,15 @@ public class MovieServiceImpl implements MovieService {
         if (!checkGenreExisted(movieDto.getGenres())) {
             throw new BadRequestException("Genre not found");
         }
-        List<Genre> genres = genreCustomRepository.findAllById(movieDto.getGenres().stream().map(GenreDto::getId).toList());
+        if (!ObjectUtils.isEmpty(movieCustomRepository.getMovieByName(movieDto.getName()))) {
+            throw new BadRequestException("Movie name already exists");
+        }
 
+        List<Genre> genres = genreCustomRepository.findAllById(movieDto.getGenres().stream().map(GenreDto::getId).toList());
 
         Movie movie = movieCustomRepository.saveAndFlush(movieMapper.toMovie(movieDto));
         movie.setGenres(genres);
-        movie.setSlug(ChangeToSlug.removeAccent(movie.getName() + "-" + movie.getId()));
+        movie.setSlug(ChangeToSlug.removeAccent(movie.getName()));
 
         if (ObjectUtils.isEmpty(movie))
             throw new BadRequestException("Create movie failed");
