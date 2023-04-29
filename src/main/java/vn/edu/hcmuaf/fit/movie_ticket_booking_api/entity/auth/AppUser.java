@@ -27,7 +27,7 @@ public class AppUser extends BaseObject implements Serializable {
     private String password;
     @Column(name="enabled")
     private Boolean enabled;
-    @Column(name="accountNonLocked")
+    @Column(name="account_non_locked")
     private Boolean accountNonLocked;
     @Column(name="facebook_id")
     private String facebookId;
@@ -39,7 +39,7 @@ public class AppUser extends BaseObject implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<AppRole> appRoles;
     @OneToOne(mappedBy = "appUser", cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_info_id", referencedColumnName = "id")
+    @JoinColumn(referencedColumnName = "id")
     private UserInfo userInfo;
 
     @JsonIgnoreProperties("appUser")
