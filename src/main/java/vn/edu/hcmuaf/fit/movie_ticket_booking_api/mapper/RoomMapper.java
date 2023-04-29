@@ -8,7 +8,6 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
-        builder = @Builder(disableBuilder = true),
         uses = {SeatMapper.class}
 )
 public interface RoomMapper {
@@ -19,6 +18,7 @@ public interface RoomMapper {
     RoomDto toRoomDto(final Room room);
 
     @Named("toRoomDtoWithoutBranch")
+    @Mapping(target = "seats", source = "seats", qualifiedByName = "toSeatDtoWithoutRoom")
     @Mapping(target = "branch", ignore = true)
     @Mapping(target = "seats", source = "seats", qualifiedByName = "toSeatDtoWithoutRoom")
     RoomDto toRoomDtoWithoutBranch(final Room room);

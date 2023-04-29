@@ -32,19 +32,17 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     @Override
     @Transactional
     public ShowtimeDto getShowtimeById(Long id) {
-        Optional<Showtime> showtime = showtimeCustomRepository.findById(id);
+        Showtime showtime = showtimeCustomRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Showtime not found")
+        );
 
-        if (showtime.isEmpty()) {
-            throw new RuntimeException("Showtime not found");
-        }
-
-        return showtimeMapper.toShowtimeDto(showtime.get());
+        return showtimeMapper.toShowtimeDto(showtime);
     }
 
     @Override
     @Transactional
     public ShowtimeDto createShowtime(ShowtimeCreate showtimeCreate) {
-        Showtime showtime = showtimeCustomRepository.saveAndFlush(showtimeMapper.toShowtime(showtimeCreate));
+        Showtime showtime = showtimeCustomRepository.save(showtimeMapper.toShowtime(showtimeCreate));
 
         return showtimeMapper.toShowtimeDto(showtime);
     }

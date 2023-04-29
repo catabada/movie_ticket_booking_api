@@ -33,5 +33,11 @@ public class SpringAsyncConfig {
         return threadPoolTaskExecutor;
     }
 
-
+    @Bean(name = "threadPoolTaskExecutorForSendEmailBookingTicket")
+    public TaskExecutor getTaskExecutorForSendEmailBookingTicket() {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        threadPoolTaskExecutor.setCorePoolSize(2);
+        threadPoolTaskExecutor.setMaxPoolSize(10);
+        return threadPoolTaskExecutor;
+    }
 }

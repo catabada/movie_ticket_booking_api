@@ -8,17 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.SecurityConstant;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.domain.AppUserDomain;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.infrastructure.AppJwtTokenProvider;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.app_user.AppUserService;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,12 +22,10 @@ import java.util.List;
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final AppJwtTokenProvider jwtTokenProvider;
-    private final AppUserService appUserService;
 
     @Autowired
-    public JwtAuthorizationFilter(AppJwtTokenProvider jwtTokenProvider, AppUserService appUserService) {
+    public JwtAuthorizationFilter(AppJwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.appUserService = appUserService;
     }
 
     @Override

@@ -19,6 +19,7 @@ import java.util.Arrays;
 @Slf4j
 @EnableAsync
 public class MovieTicketBookingApiApplication {
+
 	public static void main(String[] args) {
 		SpringApplication.run(MovieTicketBookingApiApplication.class, args);
 	}

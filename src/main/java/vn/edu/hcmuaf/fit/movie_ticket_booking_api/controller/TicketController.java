@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.*;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseSuccess;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.ticket.TicketService;
 
 import java.util.List;

@@ -2,11 +2,10 @@ package vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.seat;
 
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Seat;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.QSeat;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.AbstractCustomRepository;
 
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class SeatCustomRepositoryImpl extends AbstractCustomRepository<Seat, Long> implements SeatCustomRepository {
@@ -19,6 +18,15 @@ public class SeatCustomRepositoryImpl extends AbstractCustomRepository<Seat, Lon
     @Override
     public void saveAll() {
 
+    }
+
+    @Override
+    public List<Seat> findAll(Showtime showtime, List<String> codes) {
+        return queryFactory
+                .selectFrom(qSeat)
+                .where(qSeat.room.eq(showtime.getRoom())
+                        .and(qSeat.code.in(codes)))
+                .fetch();
     }
 
     @Override

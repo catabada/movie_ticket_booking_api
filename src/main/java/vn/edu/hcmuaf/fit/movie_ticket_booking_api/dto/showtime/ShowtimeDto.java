@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.MovieFormat;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.object_key.BaseObjectDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.room.RoomDto;
@@ -44,5 +43,5 @@ public class ShowtimeDto extends BaseObjectDto {
     private ZonedDateTime endTime;
 
     @JsonIgnoreProperties("showtime")
-    private List<TicketDto> tickets = new ArrayList<>();
+    List<InvoiceDto> invoices = new ArrayList<>();
 }

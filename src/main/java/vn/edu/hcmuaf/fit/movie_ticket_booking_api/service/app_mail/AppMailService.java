@@ -3,11 +3,10 @@ package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.app_mail;
 import jakarta.mail.MessagingException;
 import org.springframework.scheduling.annotation.Async;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.AppUser;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 
 import java.io.IOException;
-import java.util.Map;
 
 public interface AppMailService {
 
@@ -19,4 +18,8 @@ public interface AppMailService {
 
     @Async("threadPoolTaskExecutorForVerifyEmailResetPassword")
     void sendVerifyMailResetPassword(AppUserDto dto) throws MessagingException, IOException, BadRequestException;
+
+    @Async("threadPoolTaskExecutorForSendEmailBookingTicket")
+    void sendEmailBookingTicket(String email, InvoiceDto invoice) throws MessagingException, IOException,
+            BadRequestException;
 }
