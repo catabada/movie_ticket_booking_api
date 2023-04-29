@@ -20,6 +20,7 @@ public interface RoomMapper {
 
     @Named("toRoomDtoWithoutBranch")
     @Mapping(target = "branch", ignore = true)
+    @Mapping(target = "seats", source = "seats", qualifiedByName = "toSeatDtoWithoutRoom")
     RoomDto toRoomDtoWithoutBranch(final Room room);
 
     Room toRoom(final RoomDto roomDto);

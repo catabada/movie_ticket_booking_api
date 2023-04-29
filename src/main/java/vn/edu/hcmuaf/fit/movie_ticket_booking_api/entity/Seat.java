@@ -16,11 +16,20 @@ public class Seat extends BaseObject {
     @Column(name = "code")
     private String code;
 
-    @Column(name = "horizontal_index")
-    private int horizontalIndex;
+    @Column(name = "is_seat")
+    private Boolean isSeat;
 
-    @Column(name = "vertical_index")
-    private int verticalIndex;
+    @Column(name = "row_index")
+    private int rowIndex;
+
+    @Column(name = "row")
+    private int row;
+
+    @Column(name = "col")
+    private int col;
+
+    @Column(name = "column_index")
+    private int columnIndex;
 
     @Column(name = "type")
     private SeatType type;

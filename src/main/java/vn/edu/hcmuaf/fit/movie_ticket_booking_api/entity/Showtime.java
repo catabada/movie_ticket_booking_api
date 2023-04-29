@@ -3,6 +3,7 @@ package vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.MovieFormat;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -19,6 +20,10 @@ public class Showtime extends BaseObject {
     @ManyToOne
     @JoinColumn(name = "movie_id")
     private Movie movie;
+
+    @Column(name = "movie_format")
+    @Enumerated(EnumType.STRING)
+    private MovieFormat movieFormat;
 
     @ManyToOne
     @JoinColumn(name = "room_id")

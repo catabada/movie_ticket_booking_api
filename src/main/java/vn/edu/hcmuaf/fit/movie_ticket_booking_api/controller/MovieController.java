@@ -51,15 +51,6 @@ public class MovieController {
         MovieDto dto = movieService.createMovie(create.getMovie());
         return ResponseEntity.ok().body(HttpResponseSuccess.success(dto).build());
     }
-//    @PostMapping(value="/create", consumes = { "multipart/form-data"})
-//    public ResponseEntity<HttpResponse> createMovie(
-//            @RequestPart("imageVertical") MultipartFile imageVertical,
-//            @RequestPart("imageHorizontal") MultipartFile imageHorizontal,
-//            @RequestPart("create") @Valid MovieCreateDto create
-//    ) throws BaseException, IOException {
-//        MovieDto dto = movieService.createMovie(create.getMovie(), imageVertical, imageHorizontal);
-//        return ResponseEntity.ok().body(HttpResponseSuccess.success(dto).build());
-//    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<HttpResponse> deleteMovie(@PathVariable Long id) throws BaseException {

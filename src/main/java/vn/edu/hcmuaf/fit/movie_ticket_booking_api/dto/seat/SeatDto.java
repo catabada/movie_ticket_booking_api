@@ -14,12 +14,15 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.room.RoomDto;
 public class SeatDto extends BaseObjectDto {
     @NotNull
     private String code;
+    @NotNull
+    private Boolean isSeat;
+    @NotNull
+    private int columnIndex;
+    private int col;
 
     @NotNull
-    private int horizontalIndex;
-
-    @NotNull
-    private int verticalIndex;
+    private int rowIndex;
+    private int row;
 
     @NotNull
     private SeatType type;

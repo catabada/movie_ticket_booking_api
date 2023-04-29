@@ -35,13 +35,15 @@ public class ShowtimeCustomRepositoryImpl extends AbstractCustomRepository<Showt
     private BooleanBuilder buildConditionSearch(ShowtimeSearch showtimeSearch) {
         BooleanBuilder builder = new BooleanBuilder();
         if (!ObjectUtils.isEmpty(showtimeSearch.getMovie())) {
-            builder.and(qShowtime.movie.name.eq(showtimeSearch.getMovie()));
+            builder.and(qShowtime.movie.id.eq(showtimeSearch.getMovie().getId()));
         }
         if (!ObjectUtils.isEmpty(showtimeSearch.getBranch())) {
-            builder.and(qShowtime.room.branch.name.eq(showtimeSearch.getBranch()));
+            builder.and(qShowtime.room.branch.id.eq(showtimeSearch.getBranch().getId()));
         }
         if (!ObjectUtils.isEmpty(showtimeSearch.getStartTime())) {
-            builder.and(qShowtime.startTime.eq(showtimeSearch.getStartTime()));
+            builder.and(
+                    qShowtime.startTime.after(showtimeSearch.getStartTime())
+            );
         }
         return builder;
     }
