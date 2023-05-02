@@ -38,8 +38,6 @@ public class Invoice extends BaseObject {
 
     private String paymentMethod;
 
-    private String paymentStatus;
-
     @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
     @CreationTimestamp

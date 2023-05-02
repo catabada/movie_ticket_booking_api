@@ -9,6 +9,5 @@ import java.util.*;
 
 @NoRepositoryBean
 public interface SeatCustomRepository extends ICustomRepository<Seat, Long> {
-    List<Seat> findAll(Showtime showtime, List<String> codes);
     Optional<Seat> findByCode(String name);
 }

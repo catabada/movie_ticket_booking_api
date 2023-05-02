@@ -6,14 +6,12 @@ import com.google.gson.reflect.TypeToken;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.payment.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.entity.ZonedDateTimeTypeAdapter;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.invoice.InvoiceRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.shared.constant.Currency;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.shared.constant.Language;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.DateUtils;
@@ -25,7 +23,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -82,19 +79,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${payment.vn-pay.vnp_ReturnUrl}")
     private String vnp_ReturnUrl;
 
-    private final InvoiceRepository invoiceRepository;
-
-    @Autowired
-    public PaymentServiceImpl(InvoiceRepository invoiceRepository) {
-        this.invoiceRepository = invoiceRepository;
-    }
-
     @Override
     public MomoResponse createMomoCapturePayment(InvoiceDto invoice) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         ObjectMapper mapper = new ObjectMapper();
 
-        String orderId = System.currentTimeMillis() + "";
-        String requestId = System.currentTimeMillis() + "";
+        String orderId = String.valueOf(System.currentTimeMillis());
+        String requestId = String.valueOf(System.currentTimeMillis());
         String amount = 100000 + "";
         String orderInfo = "Thanh toán hóa đơn " + orderId;
         String ipnUrl = "http://localhost:8081/payment/momo/return";
@@ -113,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .partnerCode(partnerCode)
                 .build();
 
-        String payload = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + "" + "&ipnUrl=" +
+        String payload = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + "&ipnUrl=" +
                 ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode +
                 "&redirectUrl=" + returnUrl + "&requestId=" + requestId + "&requestType=" + requestType;
         String signature = StringUtils.signHmacSHA256(payload, secretKey);
@@ -130,10 +120,6 @@ public class PaymentServiceImpl implements PaymentService {
         momoResponse.setInvoice(invoice);
 
         return momoResponse;
-    }
-
-    @Override
-    public void confirmPayment(InvoiceDto invoice) throws Exception {
     }
 
     @Override

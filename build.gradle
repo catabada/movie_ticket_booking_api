@@ -28,8 +28,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	/* querydsl */
+	implementation 'com.querydsl:querydsl-jpa::jakarta'
+
+	/* mapstruct */
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+
+	/* jwt */
 	implementation 'com.auth0:java-jwt:4.4.0'
 
 	/* zxing */
@@ -49,10 +54,11 @@ dependencies {
 	implementation 'com.google.code.gson:gson:2.10.1'
 
 	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
-	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+//	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
 	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'com.querydsl:querydsl-apt::jakarta'
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
