@@ -13,6 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class MomoResponse {
     private String partnerCode;
+
     private String orderId;
 
     private String requestId;

@@ -21,15 +21,6 @@ public class SeatCustomRepositoryImpl extends AbstractCustomRepository<Seat, Lon
     }
 
     @Override
-    public List<Seat> findAll(Showtime showtime, List<String> codes) {
-        return queryFactory
-                .selectFrom(qSeat)
-                .where(qSeat.room.eq(showtime.getRoom())
-                        .and(qSeat.code.in(codes)))
-                .fetch();
-    }
-
-    @Override
     public Optional<Seat> findByCode(String code) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(qSeat)

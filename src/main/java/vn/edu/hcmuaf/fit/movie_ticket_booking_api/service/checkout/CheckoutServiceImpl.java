@@ -1,10 +1,13 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.checkout;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoleConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.*;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.payment.MomoResponse;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.seat.SeatDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.TicketDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.AppUser;
@@ -15,6 +18,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.invoice.InvoiceRepo
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.seat.SeatCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.showtime.ShowtimeCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.ticket.TicketCustomRepository;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.payment.PaymentService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.*;
 
 import java.util.ArrayList;
@@ -28,6 +32,7 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final ShowtimeCustomRepository showtimeCustomRepository;
     private final SeatCustomRepository seatCustomRepository;
     private final TicketCustomRepository ticketCustomRepository;
+    private final PaymentService paymentService;
 
     private final AppUserMapper appUserMapper;
     private final InvoiceMapper invoiceMapper;
@@ -37,7 +42,7 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Autowired
     public CheckoutServiceImpl(AppUserCustomRepository appUserCustomRepository, InvoiceRepository invoiceRepository,
                                ShowtimeCustomRepository showtimeCustomRepository, SeatCustomRepository seatCustomRepository,
-                               TicketCustomRepository ticketCustomRepository,
+                               TicketCustomRepository ticketCustomRepository, PaymentService paymentService,
                                AppUserMapper appUserMapper, InvoiceMapper invoiceMapper,
                                ShowtimeMapper showtimeMapper, TicketMapper ticketMapper) {
         this.appUserCustomRepository = appUserCustomRepository;
@@ -45,29 +50,30 @@ public class CheckoutServiceImpl implements CheckoutService {
         this.showtimeCustomRepository = showtimeCustomRepository;
         this.seatCustomRepository = seatCustomRepository;
         this.ticketCustomRepository = ticketCustomRepository;
+        this.paymentService = paymentService;
         this.appUserMapper = appUserMapper;
         this.invoiceMapper = invoiceMapper;
         this.showtimeMapper = showtimeMapper;
         this.ticketMapper = ticketMapper;
     }
 
-    @Override
-    public InvoiceDto checkout(InvoiceCreate invoiceCreate) throws BadRequestException {
-	    Showtime showtime = showtimeCustomRepository.findById(invoiceCreate.getShowtime().getId())
+    private InvoiceCreate checkout(InvoiceCreate invoiceCreate) throws Exception {
+        Showtime showtime = showtimeCustomRepository.findById(invoiceCreate.getShowtime().getId())
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy suất chiếu"));
         invoiceCreate.setShowtime(showtimeMapper.toShowtimeDto(showtime));
-        
-        List<Seat> seats = seatCustomRepository.findAll(showtime, invoiceCreate.getSeatCodes());
-        System.out.println(seats.size());
-		if (seats.size() != invoiceCreate.getSeatCodes().size()) {
-            throw new BadRequestException("Mã ghế không hợp lệ");
+
+        List<Seat> seats = new ArrayList<>();
+        for (SeatDto seatDto : invoiceCreate.getSeats()) {
+            Seat seat = seatCustomRepository.findByCode(seatDto.getCode())
+                    .orElseThrow(() -> new BadRequestException("Không tìm thấy ghế có mã " + seatDto.getCode()));
+            seats.add(seat);
         }
         List<TicketDto> tickets = createTicketDtoList(seats);
 
         String currentUserEmail = AppUtils.getCurrentEmail();
         if (!currentUserEmail.isBlank()) {
             if (!invoiceCreate.getEmail().equals(currentUserEmail)) {
-                throw new BadRequestException("Email không khớp");
+                throw new BadRequestException("Email không trùng khớp");
             }
 
             AppUser appUser = appUserCustomRepository.getUserByEmail(currentUserEmail)
@@ -78,23 +84,33 @@ public class CheckoutServiceImpl implements CheckoutService {
             }
 
             invoiceCreate.setAppUser(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(appUser));
-            return invoiceCreate;
         }
 
         tickets.forEach(invoiceCreate::addTicket);
+
+        invoiceCreate.setCode(AppUtils.createInvoiceCode());
+
         return invoiceCreate;
+    }
+
+    @Override
+    public MomoResponse checkoutMomo(InvoiceCreate invoiceCreate) throws Exception {
+        return paymentService.createMomoCapturePayment(checkout(invoiceCreate));
+    }
+
+    @Override
+    public String checkoutVNPay(InvoiceCreate invoiceCreate, HttpServletRequest request) throws Exception {
+        return paymentService.createVNPayPayment(checkout(invoiceCreate), request);
     }
 
     @Override
     public InvoiceDto confirmBooking(InvoiceDto invoiceDto) {
         Invoice invoice = invoiceMapper.toInvoice(invoiceDto);
-        invoice.setCode(AppUtils.createInvoiceCode());
 
-        List<Ticket> tickets = ticketCustomRepository.saveAllAndFlush(ticketMapper.toTicketList(invoiceDto.getTickets()));
+        List<Ticket> tickets = ticketCustomRepository.saveAll(ticketMapper.toTicketList(invoiceDto.getTickets()));
         tickets.forEach(invoice::addTicket);
 
-        Invoice userInvoice = invoiceRepository.save(invoice);
-        return invoiceMapper.toInvoiceDto(userInvoice);
+        return invoiceMapper.toInvoiceDto(invoiceRepository.save(invoice));
     }
 
     private List<TicketDto> createTicketDtoList(List<Seat> seats) {
