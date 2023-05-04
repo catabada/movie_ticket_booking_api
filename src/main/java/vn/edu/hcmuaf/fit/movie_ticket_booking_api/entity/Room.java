@@ -31,7 +31,9 @@ public class Room extends BaseObject {
     @Column(name = "room_state", nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomState roomState;
+
     @Column(name = "room_type")
+    @Enumerated(EnumType.STRING)
     private RoomType type;
 
     @ManyToOne(fetch = FetchType.LAZY)

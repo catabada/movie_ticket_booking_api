@@ -1,14 +1,3 @@
-insert into app_role(name, state)
-values ('ROLE_ADMIN', 'ACTIVE');
-insert into app_role(name, state)
-values ('ROLE_MEMBER', 'ACTIVE');
-
-insert into branch(address, name, status, state)
-values ('Hông Trung Tâm Văn Hóa Quận 12 Nguyễn Ảnh Thủ, P, 09 QL22, Trung Mỹ Tây, Quận 12, Thành phố Hồ Chí Minh',
-        'Galaxy Trung Chánh', 'ACTIVE', 'ACTIVE'),
-       ('246 Đ. Nguyễn Hồng Đào, Phường 13, Tân Bình, Thành phố Hồ Chí Minh',
-        'Galaxy Tân Bình', 'ACTIVE', 'ACTIVE');
-
 insert into genre(name, state)
 values ('Hành động', 'ACTIVE'),
        ('Phiêu lưu', 'ACTIVE'),
@@ -76,34 +65,32 @@ VALUES (103,
 
 
 
-INSERT INTO public.movie_actors
+INSERT INTO movie_actors
 VALUES (1, 'Russell Crowe');
-INSERT INTO public.movie_actors
+INSERT INTO movie_actors
 VALUES (1, 'Laurel Marsden');
-INSERT INTO public.movie_actors
+INSERT INTO movie_actors
 VALUES (1, 'Franco Nero');
-INSERT INTO public.movie_actors
+INSERT INTO movie_actors
 VALUES (1, 'Alex Essoe');
-INSERT INTO public.movie_actors
+INSERT INTO movie_actors
 VALUES (1, 'Ralph Ineson');
 
-INSERT INTO public.movie_actors
+INSERT INTO movie_actors
 VALUES (2, 'Russell Crowe');
-INSERT INTO public.movie_actors
+INSERT INTO movie_actors
 VALUES (2, 'Alex Essoe');
-INSERT INTO public.movie_actors
+INSERT INTO movie_actors
 VALUES (2, 'Franco Nero');
-INSERT INTO public.movie_actors
+INSERT INTO movie_actors
 VALUES (2, 'Daniel Zovatto');
 
-
-
-INSERT INTO public.movie_genre
+INSERT INTO movie_genre
 VALUES (2, 1);
-INSERT INTO public.movie_genre
+INSERT INTO movie_genre
 VALUES (3, 1);
 
-INSERT INTO public.movie_genre
+INSERT INTO movie_genre
 VALUES (11, 2);
-INSERT INTO public.movie_genre
+INSERT INTO movie_genre
 VALUES (17, 2);
