@@ -13,7 +13,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.SeatType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Seat extends BaseObject {
-    @Column(name = "code")
+    @Column(nullable = false)
     private String code;
 
     @Column(name = "is_seat")
@@ -31,10 +31,11 @@ public class Seat extends BaseObject {
     @Column(name = "column_index")
     private int columnIndex;
 
-    @Column(name = "type")
-    private SeatType type;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private SeatType seatType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "room_id")
     private Room room;
 }

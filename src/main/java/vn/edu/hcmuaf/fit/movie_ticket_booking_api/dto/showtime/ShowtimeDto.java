@@ -6,12 +6,11 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.MovieFormat;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.MovieFormat;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.movie.MovieDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.object_key.BaseObjectDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.room.RoomDto;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.TicketDto;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;

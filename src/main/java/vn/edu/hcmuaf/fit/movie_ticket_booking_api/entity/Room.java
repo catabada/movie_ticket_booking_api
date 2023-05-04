@@ -16,18 +16,24 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Room extends BaseObject {
-    @Column(name = "name", nullable = false)
+    @Column(nullable = false)
     private String name;
 
     @Column(name = "row", nullable = false)
     private int row;
+
     @Column(name = "col", nullable = false)
     private int col;
+
     @Column(name = "total_seat", nullable = false)
     private int totalSeat;
-    @Column(name = "room_state")
+
+    @Column(name = "room_state", nullable = false)
+    @Enumerated(EnumType.STRING)
     private RoomState roomState;
+
     @Column(name = "room_type")
+    @Enumerated(EnumType.STRING)
     private RoomType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
