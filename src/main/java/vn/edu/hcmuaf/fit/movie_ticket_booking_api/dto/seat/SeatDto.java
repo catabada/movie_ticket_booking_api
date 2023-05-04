@@ -26,7 +26,7 @@ public class SeatDto extends BaseObjectDto {
     private int row;
 
     @NotNull
-    private SeatType type;
+    private SeatType seatType;
 
     @JsonIgnoreProperties("seats")
     private RoomDto room;

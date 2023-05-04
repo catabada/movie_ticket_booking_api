@@ -13,7 +13,7 @@ import java.util.List;
 public interface ShowtimeMapper {
 
     @Named("toShowtimeDto")
-    @Mapping(target = "room", source = "room", qualifiedByName = "toRoomDtoWithoutBranch")
+    @Mapping(target = "room", source = "room", qualifiedByName = "toRoomDto")
     @Mapping(target = "movie", source = "movie", qualifiedByName = "toMovieDto")
     @Mapping(target = "invoices.showtime", ignore = true)
     ShowtimeDto toShowtimeDto(final Showtime showtime);
