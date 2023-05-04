@@ -85,9 +85,9 @@ public class PaymentServiceImpl implements PaymentService {
 
         String orderId = String.valueOf(System.currentTimeMillis());
         String requestId = String.valueOf(System.currentTimeMillis());
-        String amount = 100000 + "";
+        String amount = 1000 + "";
         String orderInfo = "Thanh toán hóa đơn " + orderId;
-        String ipnUrl = "http://localhost:8081/payment/momo/return";
+        String ipnUrl = "http://localhost:8081/payment/return";
         String requestType = "captureWallet";
         MomoRequest request = MomoRequest.builder()
                 .orderId(orderId)

@@ -8,16 +8,19 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.payment.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseSuccess;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.checkout.CheckoutService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.payment.PaymentService;
 
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
     private final PaymentService paymentService;
+    private final CheckoutService checkoutService;
 
     @Autowired
-    public PaymentController(PaymentService paymentService) {
+    public PaymentController(PaymentService paymentService, CheckoutService checkoutService) {
         this.paymentService = paymentService;
+        this.checkoutService = checkoutService;
     }
 
     @PostMapping("/momo/create")
@@ -28,7 +31,9 @@ public class PaymentController {
 
     @PostMapping("/momo/return")
     public ResponseEntity<HttpResponse> returnByMomo(CaptureMoMoConfirmResponse captureMoMoConfirmResponse) {
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
+        if(captureMoMoConfirmResponse.getResultCode() == 0)
+            return ResponseEntity.ok(HttpResponseSuccess.success(checkoutService).build());
+        return ResponseEntity.ok(HttpResponseSuccess.success(captureMoMoConfirmResponse).build());
     }
 
     @PostMapping("/vn-pay/create")

@@ -57,14 +57,21 @@ public class CheckoutServiceImpl implements CheckoutService {
         this.ticketMapper = ticketMapper;
     }
 
-    private InvoiceCreate checkout(InvoiceCreate invoiceCreate) throws Exception {
+    private InvoiceDto checkout(InvoiceCreate invoiceCreate) throws Exception {
+        InvoiceDto invoiceDto = InvoiceDto.builder()
+                .id(0L)
+                .name(invoiceCreate.getName())
+                .email(invoiceCreate.getEmail())
+                .paymentMethod(invoiceCreate.getPaymentMethod())
+                .build();
+
         Showtime showtime = showtimeCustomRepository.findById(invoiceCreate.getShowtime().getId())
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy suất chiếu"));
-        invoiceCreate.setShowtime(showtimeMapper.toShowtimeDto(showtime));
+        invoiceDto.setShowtime(showtimeMapper.toShowtimeDto(showtime));
 
         List<Seat> seats = new ArrayList<>();
         for (SeatDto seatDto : invoiceCreate.getSeats()) {
-            Seat seat = seatCustomRepository.findByCode(seatDto.getCode())
+            Seat seat = seatCustomRepository.findById(seatDto.getId())
                     .orElseThrow(() -> new BadRequestException("Không tìm thấy ghế có mã " + seatDto.getCode()));
             seats.add(seat);
         }
@@ -83,14 +90,15 @@ public class CheckoutServiceImpl implements CheckoutService {
                 throw new BadRequestException("Bạn không có quyền thanh toán");
             }
 
-            invoiceCreate.setAppUser(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(appUser));
+            invoiceDto.setAppUser(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(appUser));
         }
 
-        tickets.forEach(invoiceCreate::addTicket);
+//        tickets.forEach(invoiceDto::addTicket);
+        invoiceDto.setTickets(tickets);
 
-        invoiceCreate.setCode(AppUtils.createInvoiceCode());
+        invoiceDto.setCode(AppUtils.createInvoiceCode());
 
-        return invoiceCreate;
+        return invoiceDto;
     }
 
     @Override

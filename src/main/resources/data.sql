@@ -3,7 +3,7 @@ values ('ROLE_ADMIN', 'ACTIVE');
 insert into app_role(name, state)
 values ('ROLE_MEMBER', 'ACTIVE');
 
-insert into branch(address, name, status, state)
+insert into branch(address, name, branch_status, state)
 values ('Hông Trung Tâm Văn Hóa Quận 12 Nguyễn Ảnh Thủ, P, 09 QL22, Trung Mỹ Tây, Quận 12, Thành phố Hồ Chí Minh',
         'Galaxy Trung Chánh', 'ACTIVE', 'ACTIVE'),
        ('246 Đ. Nguyễn Hồng Đào, Phường 13, Tân Bình, Thành phố Hồ Chí Minh',

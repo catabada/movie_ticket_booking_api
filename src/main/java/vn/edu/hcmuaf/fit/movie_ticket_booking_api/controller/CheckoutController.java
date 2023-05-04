@@ -56,7 +56,7 @@ public class CheckoutController {
     @PostMapping("/confirm")
     public ResponseEntity<HttpResponse> confirmBooking(@RequestBody InvoiceDto invoiceDto) throws BadRequestException, MessagingException, IOException {
         InvoiceDto data = checkoutService.confirmBooking(invoiceDto);
-//        appMailService.sendEmailBookingTicket(invoiceDto.getEmail(), invoiceDto);
+        appMailService.sendEmailBookingTicket(invoiceDto.getEmail(), invoiceDto);
         return ResponseEntity.ok(HttpResponseSuccess.success(data).build());
     }
 

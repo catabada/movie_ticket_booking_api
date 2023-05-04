@@ -18,7 +18,6 @@ import java.time.ZonedDateTime;
 @SuperBuilder
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class BaseObject implements Serializable {
     @Id
@@ -35,4 +34,9 @@ public class BaseObject implements Serializable {
     protected ZonedDateTime modifiedDate;
     @Column(name = "deleted_date")
     protected ZonedDateTime deletedDate;
+
+    public BaseObject() {
+        this.id = 0L;
+        this.state = ObjectState.ACTIVE;
+    }
 }
