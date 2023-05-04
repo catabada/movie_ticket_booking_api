@@ -21,7 +21,7 @@ public class BranchDto extends BaseObjectDto {
     @NotNull
     protected String address;
 
-    protected BranchStatus status;
+    protected BranchStatus branchStatus;
 
     @JsonIgnoreProperties("branch")
     protected List<RoomDto> rooms = new ArrayList<>();

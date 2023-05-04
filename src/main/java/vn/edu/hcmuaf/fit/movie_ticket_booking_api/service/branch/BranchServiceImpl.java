@@ -50,7 +50,7 @@ public class BranchServiceImpl implements BranchService {
             throw new BadRequestException("Branch already exists");
         }
 
-        branchCreate.setStatus(BranchStatus.ACTIVE);
+        branchCreate.setBranchStatus(BranchStatus.ACTIVE);
 
         Branch newBranch = branchCustomRepository.saveAndFlush(branchMapper.toBranch(branchCreate));
 
