@@ -29,7 +29,10 @@ public class MovieServiceImpl implements MovieService {
     private final MovieMapper movieMapper;
 
     @Autowired
-    public MovieServiceImpl(final MovieCustomRepository movieCustomRepository, final GenreCustomRepository genreCustomRepository, MovieGenreMapper movieGenreMapper, final MovieMapper movieMapper) {
+    public MovieServiceImpl(final MovieCustomRepository movieCustomRepository,
+                            final GenreCustomRepository genreCustomRepository,
+                            MovieGenreMapper movieGenreMapper,
+                            final MovieMapper movieMapper) {
         this.movieCustomRepository = movieCustomRepository;
         this.genreCustomRepository = genreCustomRepository;
         this.movieGenreMapper = movieGenreMapper;
@@ -47,12 +50,15 @@ public class MovieServiceImpl implements MovieService {
         if (!checkGenreExisted(movieDto.getGenres())) {
             throw new BadRequestException("Genre not found");
         }
-        List<Genre> genres = genreCustomRepository.findAllById(movieDto.getGenres().stream().map(GenreDto::getId).toList());
+        if (!ObjectUtils.isEmpty(movieCustomRepository.getMovieByName(movieDto.getName()))) {
+            throw new BadRequestException("Movie name already exists");
+        }
 
+        List<Genre> genres = genreCustomRepository.findAllById(movieDto.getGenres().stream().map(GenreDto::getId).toList());
 
         Movie movie = movieCustomRepository.saveAndFlush(movieMapper.toMovie(movieDto));
         movie.setGenres(genres);
-        movie.setSlug(ChangeToSlug.removeAccent(movie.getName() + "-" + movie.getId()));
+        movie.setSlug(ChangeToSlug.removeAccent(movie.getName()));
 
         if (ObjectUtils.isEmpty(movie))
             throw new BadRequestException("Create movie failed");

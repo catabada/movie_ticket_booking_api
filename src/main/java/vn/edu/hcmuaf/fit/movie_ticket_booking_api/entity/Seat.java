@@ -16,11 +16,20 @@ public class Seat extends BaseObject {
     @Column(nullable = false)
     private String code;
 
-    @Column(nullable = false)
-    private int horizontal;
+    @Column(name = "is_seat")
+    private Boolean isSeat;
 
-    @Column(nullable = false)
-    private int vertical;
+    @Column(name = "row_index")
+    private int rowIndex;
+
+    @Column(name = "row")
+    private int row;
+
+    @Column(name = "col")
+    private int col;
+
+    @Column(name = "column_index")
+    private int columnIndex;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

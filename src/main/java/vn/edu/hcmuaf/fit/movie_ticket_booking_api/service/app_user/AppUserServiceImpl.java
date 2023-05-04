@@ -13,6 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.BeanIdConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.FileConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoleConstant;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.UploadFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.domain.AppUserDomain;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.user_info.UserInfoDto;
@@ -331,7 +332,7 @@ public class AppUserServiceImpl implements AppUserService {
                 throw new BadRequestException("Please verify your email");
             }
 
-            MediaFile mediaFile = imageFileService.uploadFile(appUser.getEmail(), file);
+            MediaFile mediaFile = imageFileService.uploadFile(appUser.getEmail(), file, UploadFile.AVATAR_IMAGE);
             appUser.getUserInfo().setAvatar(mediaFile.getPathFolder());
 
             appUserCustomRepository.saveAndFlush(appUser);

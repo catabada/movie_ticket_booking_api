@@ -53,7 +53,7 @@ public class RoomServiceImpl implements RoomService {
 
 
         Room room = roomMapper.toRoom(roomCreate);
-        room.setRoomState(RoomState.OCCUPIED);
+        room.setRoomState(RoomState.AVAILABLE);
 
         Room newRoom = roomCustomRepository.save(room);
 
