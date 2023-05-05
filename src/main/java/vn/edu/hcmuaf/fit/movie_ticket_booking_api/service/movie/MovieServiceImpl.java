@@ -54,11 +54,8 @@ public class MovieServiceImpl implements MovieService {
             throw new BadRequestException("Movie name already exists");
         }
 
-        List<Genre> genres = genreCustomRepository.findAllById(movieDto.getGenres().stream().map(GenreDto::getId).toList());
-
-        movieDto.setGenres(movieGenreMapper.toGenreDtoList(genres));
         movieDto.setSlug(ChangeToSlug.removeAccent(movieDto.getName()));
-        Movie movie = movieCustomRepository.save(movieMapper.toMovie(movieDto));
+        Movie movie = movieCustomRepository.saveAndFlush(movieMapper.toMovie(movieDto));
 
         if (ObjectUtils.isEmpty(movie))
             throw new BadRequestException("Create movie failed");
