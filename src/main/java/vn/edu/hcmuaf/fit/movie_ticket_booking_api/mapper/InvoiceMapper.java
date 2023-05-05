@@ -10,12 +10,12 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
-        uses = {ShowtimeMapper.class}
+        uses = {ShowtimeMapper.class, TicketMapper.class}
 )
 public interface InvoiceMapper {
     @Named("toInvoiceDto")
-    @Mapping(target = "showtime.invoices", ignore = true)
-    @Mapping(target = "tickets.invoice", ignore = true)
+    @Mapping(target = "showtime", source = "showtime", qualifiedByName = "toShowtimeDtoWithoutInvoices")
+    @Mapping(target = "tickets", source = "tickets", qualifiedByName = "toTicketDto")
     InvoiceDto toInvoiceDto(Invoice userInvoice);
 
     Invoice toInvoice(InvoiceDto invoiceDto);
@@ -25,6 +25,4 @@ public interface InvoiceMapper {
 
     List<Invoice> toInvoiceList(List<InvoiceDto> invoiceDtos);
 
-    @Mapping(target = "invoice", ignore = true)
-    TicketDto toTicketDto(final Ticket ticket);
 }

@@ -26,7 +26,7 @@ public class BaseObject implements Serializable {
     @Enumerated(EnumType.STRING)
     protected ObjectState state;
 
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_date" , columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     protected ZonedDateTime createdDate;
 

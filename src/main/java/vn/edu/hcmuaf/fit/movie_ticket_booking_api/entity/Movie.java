@@ -64,7 +64,7 @@ public class Movie extends BaseObject implements Serializable {
     @Enumerated(EnumType.STRING)
     private List<MovieFormat> movieFormats;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),

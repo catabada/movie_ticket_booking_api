@@ -2,12 +2,14 @@ package vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.PaymentMethod;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.PaymentStatus;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.object_key.BaseObjectDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.showtime.ShowtimeDto;
@@ -30,14 +32,19 @@ public class InvoiceDto extends BaseObjectDto {
     @Email(message = "Email không hợp lệ")
     private String email;
 
+    @NotBlank(message = "Tổng tiền không được để trống")
+    private Long totalPrice;
+
     private AppUserDto appUser;
 
     @NotNull(message = "Suất chiếu không hợp lệ")
     private ShowtimeDto showtime;
 
-    @NotBlank
+    @NotNull(message = "Phương thức thanh toán không hợp lệ")
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
+
+    private PaymentStatus paymentStatus;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
     private ZonedDateTime paymentDate;
