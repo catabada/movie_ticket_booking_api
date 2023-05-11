@@ -71,8 +71,8 @@ public class AppUserDomain implements UserDetails {
         return this.appUser.getId();
     }
 
-    public String getFirstName() {
-        return this.appUser.getUserInfo().getFirstName();
+    public String getFullName() {
+        return this.appUser.getUserInfo().getFullName();
     }
 
     public String getAvatar() {

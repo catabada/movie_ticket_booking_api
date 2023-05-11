@@ -9,10 +9,10 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-
 public class UserLoginResponse {
+    private Long userId;
     private String token;
     private String email;
-
-    private Long userId;
+    private String fullName;
+    private String avatar;
 }

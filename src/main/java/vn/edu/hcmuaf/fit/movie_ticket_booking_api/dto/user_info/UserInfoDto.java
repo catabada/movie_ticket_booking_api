@@ -14,16 +14,12 @@ import java.util.Date;
 @SuperBuilder
 public class UserInfoDto extends BaseObjectDto {
     protected String fullName;
-    protected String firstName;
-    protected String lastName;
     protected Boolean isMale;
     protected String avatar;
     protected Date dateOfBirth;
 
     public UserInfoDto() {
         this.fullName = "";
-        this.firstName = "";
-        this.lastName = "";
         this.isMale = true;
         this.avatar = "";
         this.dateOfBirth = new Date();

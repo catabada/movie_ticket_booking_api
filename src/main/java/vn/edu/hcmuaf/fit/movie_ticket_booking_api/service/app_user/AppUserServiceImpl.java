@@ -40,6 +40,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional
 @Qualifier(BeanIdConstant.USER_DETAIL_SERVICE)
 public class AppUserServiceImpl implements AppUserService {
     private final AppUserCustomRepository appUserCustomRepository;
@@ -71,51 +72,49 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    @Transactional
     public void register(AppUserDto dto) throws BaseException {
         try {
-            // Check email exists
-            boolean isExisted = appUserCustomRepository.existsByEmail(dto.getEmail());
-            if (isExisted) {
-                throw new BadRequestException("Email already exists");
+            boolean userByEmail = appUserCustomRepository.existsByEmail(dto.getEmail());
+            if (userByEmail) {
+                throw new BadRequestException("Email đã tồn tại");
             }
 
-            AppUser user = appUserMapper.toAppUser(dto);
+            boolean userByPhone = appUserCustomRepository.findByPhone(dto.getPhone());
+            if (userByPhone) {
+                throw new BadRequestException("Số điện thoại đã tồn tại");
+            }
+
+            AppUser newUser = appUserMapper.toAppUser(dto);
             // Set role
             AppRole defaultRole = appRoleRepository.getByName(RoleConstant.ROLE_MEMBER).orElse(null);
-            user.getAppRoles().add(defaultRole);
+            newUser.getAppRoles().add(defaultRole);
 
             // Random image
-            user.getUserInfo().setAvatar(FileConstant.TEMP_PROFILE_IMAGE_BASE_URL + dto.getEmail());
+            newUser.getUserInfo().setAvatar(FileConstant.TEMP_PROFILE_IMAGE_BASE_URL + dto.getEmail());
             // Hash password
-            user.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
+            newUser.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
 
             // Save user and check save success
-
-            if (ObjectUtils.isEmpty(appUserCustomRepository.saveAndFlush(user))) {
-                throw new BadRequestException("Register failed");
-            }
+            newUser = appUserCustomRepository.saveAndFlush(newUser);
 
             // Send verify email
-            appMailService.sendVerifyEmailRegister(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(user));
+            appMailService.sendVerifyEmailRegister(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(newUser));
 
         } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
+            throw new BadRequestException("Đăng ký không thành công");
         }
     }
 
     @Override
-    @Transactional
     public void verifyEmail(String token) throws BaseException {
         try {
-            Optional<VerificationToken> optional = verificationTokenCustomRepository.getVerificationTokenByToken(UUID.fromString(token));
-            if (optional.isEmpty()) {
-                throw new BadRequestException("Invalid token");
+            VerificationToken verificationToken = verificationTokenCustomRepository.getVerificationTokenByToken(UUID.fromString(token))
+                    .orElseThrow(() -> new BadRequestException("Token không hợp lệ"));
+
+            if (verificationToken.getExpiredDate().isBefore(ZonedDateTime.now())) {
+                throw new BadRequestException("Token đã hết hạn");
             }
-            if (optional.get().getExpiredDate().isBefore(ZonedDateTime.now())) {
-                throw new BadRequestException("Token expired");
-            }
-            VerificationToken verificationToken = optional.get();
+
             verificationToken.setIsVerified(true);
             verificationToken.getAppUser().setEnabled(true);
             verificationTokenCustomRepository.saveAndFlush(verificationToken);
@@ -125,14 +124,9 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    @Transactional
     public void resendEmailVerifyRegister(String email) throws BaseException {
         try {
-            Optional<AppUser> optional = appUserCustomRepository.getUserByEmail(email);
-            if (optional.isEmpty()) {
-                throw new BadRequestException("Email not found");
-            }
-            AppUser user = optional.get();
+            AppUser user = appUserCustomRepository.getUserByEmail(email).orElseThrow(() -> new BadRequestException("Email không tồn tại"));
             appMailService.resendEmailVerifyRegister(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(user));
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
@@ -140,20 +134,19 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    @Transactional
     public UserLoginResponse login(UserLoginRequest loginRequest) throws BaseException {
         try {
             AppUserDomain appUserDomain = (AppUserDomain) loadUserByUsername(loginRequest.getEmail());
             if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), appUserDomain.getPassword())) {
-                throw new BadRequestException("Invalid email or password");
+                throw new BadRequestException("Email hoặc mật khẩu không đúng");
             }
 
             if (!appUserDomain.isAccountNonLocked()) {
-                throw new BadRequestException("Your account is locked");
+                throw new BadRequestException("Tài khoản của bạn đã bị khóa");
             }
 
             if (!appUserDomain.isEnabled()) {
-                throw new BadRequestException("Please verify your email");
+                throw new BadRequestException("Tài khoản của bạn chưa được kích hoạt");
             }
 
             // Generate token
@@ -162,22 +155,22 @@ public class AppUserServiceImpl implements AppUserService {
             return UserLoginResponse.builder()
                     .userId(appUserDomain.getUserId())
                     .token(userToken)
-                    .email(appUserDomain.getEmail()).build();
+                    .email(appUserDomain.getEmail())
+                    .fullName(appUserDomain.getFullName())
+                    .avatar(appUserDomain.getAvatar())
+                    .build();
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
     }
 
     @Override
-    @Transactional
     public void updateProfile(UserInfoUpdate userInfoUpdate) throws BaseException {
         if (!AppUtils.getCurrentEmail().equals(userInfoUpdate.getEmail()))
             throw new BadRequestException("You should login to update your profile");
 
-        Optional<AppUser> optional = appUserCustomRepository.getUserByEmail(AppUtils.getCurrentEmail());
-        if (optional.isEmpty()) throw new BadRequestException("Not found user: " + userInfoUpdate.getEmail());
-
-        AppUser appUser = optional.get();
+        AppUser appUser = appUserCustomRepository.getUserByEmail(AppUtils.getCurrentEmail())
+                .orElseThrow(() -> new BadRequestException("Not found user: " + userInfoUpdate.getEmail()));
 
         if (!appUser.getAccountNonLocked()) {
             throw new BadRequestException("Your account is locked");
@@ -189,8 +182,6 @@ public class AppUserServiceImpl implements AppUserService {
 
 
         appUser.getUserInfo().setFullName(userInfoUpdate.getFullName());
-        appUser.getUserInfo().setFirstName(userInfoUpdate.getFirstName());
-        appUser.getUserInfo().setLastName(userInfoUpdate.getLastName());
         appUser.getUserInfo().setIsMale(userInfoUpdate.getIsMale());
         appUser.getUserInfo().setDateOfBirth(userInfoUpdate.getDateOfBirth());
 
@@ -221,7 +212,6 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    @Transactional
     public void changePassword(ChangePasswordRequest changePasswordRequest) throws BaseException {
         if (!AppUtils.getCurrentEmail().equals(changePasswordRequest.getEmail()))
             throw new BadRequestException("You should login to change password");
@@ -250,7 +240,6 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    @Transactional
     public void forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws BaseException {
         try {
             Optional<AppUser> optional = appUserCustomRepository.getUserByEmail(forgotPasswordRequest.getEmail());
@@ -275,7 +264,6 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    @Transactional
     public void verifyEmailResetPassword(String token) throws BaseException {
         System.out.println(token);
         try {
@@ -297,7 +285,6 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    @Transactional
     public void resetPassword(final ResetPasswordRequest resetPasswordRequest) throws BaseException {
         VerificationToken verificationToken = verificationTokenCustomRepository.getVerificationTokenByToken(
                 UUID.fromString(

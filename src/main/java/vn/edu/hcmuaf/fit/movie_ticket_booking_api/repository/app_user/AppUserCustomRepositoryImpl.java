@@ -58,7 +58,16 @@ public class AppUserCustomRepositoryImpl extends AbstractCustomRepository<AppUse
                 .where(qAppUser.email.eq(email)
                         .and(qAppUser.state.ne(ObjectState.DELETED))
                 )
-                .fetchCount() > 0;
+                .stream().findAny().isPresent();
+    }
+
+    @Override
+    public Boolean findByPhone(String phone) {
+        return queryFactory.selectFrom(qAppUser)
+                .where(qAppUser.phone.eq(phone)
+                        .and(qAppUser.state.ne(ObjectState.DELETED))
+                )
+                .stream().findAny().isPresent();
     }
 
     @Override

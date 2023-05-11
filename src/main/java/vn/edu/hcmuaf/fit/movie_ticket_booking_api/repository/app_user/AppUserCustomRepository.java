@@ -15,6 +15,8 @@ public interface AppUserCustomRepository extends ICustomRepository<AppUser, Long
 
     Boolean existsByEmail(final String email);
 
+    Boolean findByPhone(final String phone);
+
     Optional<AppUser> getUserByEmail(final String email);
 
     Optional<AppUser> getUserByPhone(final String phone);

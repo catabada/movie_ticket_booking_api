@@ -9,7 +9,6 @@ import lombok.experimental.SuperBuilder;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.BaseObject;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Invoice;
 
-import java.io.Serializable;
 import java.util.Set;
 
 @Entity
@@ -18,26 +17,34 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class AppUser extends BaseObject implements Serializable {
+public class AppUser extends BaseObject {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
     @Column(name = "phone", nullable = false, unique = true)
     private String phone;
+
     @Column(name = "password", nullable = false)
     private String password;
+
     @Column(name="enabled")
     private Boolean enabled;
+
     @Column(name="account_non_locked")
     private Boolean accountNonLocked;
+
     @Column(name="facebook_id")
     private String facebookId;
+
     @Column(name="google_id")
     private String googleId;
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<AppRole> appRoles;
+
     @OneToOne(mappedBy = "appUser", cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private UserInfo userInfo;
