@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
-        uses = {InvoiceMapper.class, SeatMapper.class}
+        uses = {SeatMapper.class}
 )
 public interface TicketMapper {
 
@@ -18,6 +18,7 @@ public interface TicketMapper {
     TicketInfoDto toTicketInfoDto(final Ticket ticket);
 
     @Named("toTicketDto")
+    @Mapping(target = "invoice", ignore = true)
     @Mapping(target = "seat", source = "seat", qualifiedByName = "toSeatDtoWithoutRoom")
     TicketDto toTicketDto(final Ticket ticket);
 

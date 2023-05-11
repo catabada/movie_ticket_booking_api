@@ -4,8 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.PaymentStatus;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoleConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.*;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.payment.CaptureMoMoConfirmResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.payment.MomoResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.seat.SeatDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.TicketDto;
@@ -18,9 +21,11 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.invoice.InvoiceRepo
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.seat.SeatCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.showtime.ShowtimeCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.ticket.TicketCustomRepository;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.app_mail.AppMailService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.payment.PaymentService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.*;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,18 +38,20 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final SeatCustomRepository seatCustomRepository;
     private final TicketCustomRepository ticketCustomRepository;
     private final PaymentService paymentService;
-
     private final AppUserMapper appUserMapper;
     private final InvoiceMapper invoiceMapper;
     private final ShowtimeMapper showtimeMapper;
     private final TicketMapper ticketMapper;
+    private final AppMailService appMailService;
 
     @Autowired
     public CheckoutServiceImpl(AppUserCustomRepository appUserCustomRepository, InvoiceRepository invoiceRepository,
                                ShowtimeCustomRepository showtimeCustomRepository, SeatCustomRepository seatCustomRepository,
                                TicketCustomRepository ticketCustomRepository, PaymentService paymentService,
                                AppUserMapper appUserMapper, InvoiceMapper invoiceMapper,
-                               ShowtimeMapper showtimeMapper, TicketMapper ticketMapper) {
+                               ShowtimeMapper showtimeMapper, TicketMapper ticketMapper,
+                               AppMailService appMailService
+    ) {
         this.appUserCustomRepository = appUserCustomRepository;
         this.invoiceRepository = invoiceRepository;
         this.showtimeCustomRepository = showtimeCustomRepository;
@@ -55,20 +62,31 @@ public class CheckoutServiceImpl implements CheckoutService {
         this.invoiceMapper = invoiceMapper;
         this.showtimeMapper = showtimeMapper;
         this.ticketMapper = ticketMapper;
+        this.appMailService = appMailService;
     }
 
-    private InvoiceCreate checkout(InvoiceCreate invoiceCreate) throws Exception {
+    private InvoiceDto checkout(InvoiceCreate invoiceCreate) throws Exception {
+        Invoice invoice = Invoice.builder()
+                .id(0L)
+                .name(invoiceCreate.getName())
+                .totalPrice(invoiceCreate.getTotalPrice())
+                .email(invoiceCreate.getEmail())
+                .paymentMethod(invoiceCreate.getPaymentMethod())
+                .paymentStatus(PaymentStatus.PENDING)
+                .state(ObjectState.ACTIVE)
+                .build();
+
         Showtime showtime = showtimeCustomRepository.findById(invoiceCreate.getShowtime().getId())
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy suất chiếu"));
-        invoiceCreate.setShowtime(showtimeMapper.toShowtimeDto(showtime));
+        invoice.setShowtime(showtime);
 
         List<Seat> seats = new ArrayList<>();
         for (SeatDto seatDto : invoiceCreate.getSeats()) {
-            Seat seat = seatCustomRepository.findByCode(seatDto.getCode())
+            Seat seat = seatCustomRepository.findById(seatDto.getId())
                     .orElseThrow(() -> new BadRequestException("Không tìm thấy ghế có mã " + seatDto.getCode()));
             seats.add(seat);
         }
-        List<TicketDto> tickets = createTicketDtoList(seats);
+        List<Ticket> tickets = createTicketList(seats);
 
         String currentUserEmail = AppUtils.getCurrentEmail();
         if (!currentUserEmail.isBlank()) {
@@ -83,19 +101,42 @@ public class CheckoutServiceImpl implements CheckoutService {
                 throw new BadRequestException("Bạn không có quyền thanh toán");
             }
 
-            invoiceCreate.setAppUser(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(appUser));
+            invoice.setAppUser(appUser);
         }
 
-        tickets.forEach(invoiceCreate::addTicket);
 
-        invoiceCreate.setCode(AppUtils.createInvoiceCode());
+        tickets.forEach(invoice::addTicket);
 
-        return invoiceCreate;
+        invoice.setCode(AppUtils.createInvoiceCode());
+        invoice.setTickets(tickets);
+
+        invoice = invoiceRepository.save(invoice);
+
+        return invoiceMapper.toInvoiceDto(invoice);
     }
 
     @Override
     public MomoResponse checkoutMomo(InvoiceCreate invoiceCreate) throws Exception {
         return paymentService.createMomoCapturePayment(checkout(invoiceCreate));
+    }
+
+    @Override
+    public void returnByMomo(CaptureMoMoConfirmResponse captureMoMoConfirmResponse) throws Exception {
+        Invoice invoice = invoiceRepository.findByCode(captureMoMoConfirmResponse.getOrderId())
+                .orElseThrow(() -> new BadRequestException("Không tìm thấy hóa đơn"));
+
+        InvoiceDto invoiceDto = invoiceMapper.toInvoiceDto(invoice);
+        if (captureMoMoConfirmResponse.getResultCode() == 0) {
+            invoice.setPaymentStatus(PaymentStatus.SUCCESS);
+            invoice.setPaymentDate(ZonedDateTime.now());
+            invoiceRepository.save(invoice);
+
+            appMailService.sendEmailBookingTicket(invoiceDto.getEmail(), invoiceDto);
+        } else {
+            invoice.setPaymentStatus(PaymentStatus.FAILED);
+            invoiceRepository.save(invoice);
+        }
+
     }
 
     @Override
@@ -113,17 +154,17 @@ public class CheckoutServiceImpl implements CheckoutService {
         return invoiceMapper.toInvoiceDto(invoiceRepository.save(invoice));
     }
 
-    private List<TicketDto> createTicketDtoList(List<Seat> seats) {
+    private List<Ticket> createTicketList(List<Seat> seats) {
         List<Ticket> tickets = new ArrayList<>();
 
-	    seats.forEach(seat -> {
-		    Ticket ticket = new Ticket();
-		    ticket.setSeat(seat);
+        seats.forEach(seat -> {
+            Ticket ticket = new Ticket();
+            ticket.setSeat(seat);
 
             tickets.add(ticket);
-	    });
+        });
 
 
-		return ticketMapper.toTicketDtoList(tickets);
+        return tickets;
     }
 }

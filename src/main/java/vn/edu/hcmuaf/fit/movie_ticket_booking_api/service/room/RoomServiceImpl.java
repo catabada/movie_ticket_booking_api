@@ -57,12 +57,12 @@ public class RoomServiceImpl implements RoomService {
 
         Room newRoom = roomCustomRepository.save(room);
 
-        for (Seat seat : room.getSeats()) {
-            seat.setRoom(newRoom);
-        }
+//        for (Seat seat : room.getSeats()) {
+//            seat.setRoom(newRoom);
+//        }
 
-        newRoom.setSeats(room.getSeats());
-        newRoom = roomCustomRepository.save(newRoom);
+//        newRoom.setSeats(room.getSeats());
+//        newRoom = roomCustomRepository.save(newRoom);
 
         return roomMapper.toRoomDto(newRoom);
     }

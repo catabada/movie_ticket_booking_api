@@ -3,12 +3,13 @@ package vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper;
 import org.mapstruct.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.showtime.ShowtimeDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.TicketDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.*;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        uses = {RoomMapper.class, MovieGenreMapper.class}
+        uses = {RoomMapper.class, MovieGenreMapper.class, TicketMapper.class}
 )
 public interface ShowtimeMapper {
 
@@ -32,5 +33,6 @@ public interface ShowtimeMapper {
     List<Showtime> toShowtimeList(final List<ShowtimeDto> showtimeDtoList);
 
     @Mapping(target = "showtime", ignore = true)
+    @Mapping(target = "tickets", source = "tickets", qualifiedByName = "toTicketDto")
     InvoiceDto toInvoiceDto(final Invoice invoice);
 }

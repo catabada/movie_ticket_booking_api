@@ -16,7 +16,6 @@ import java.time.ZonedDateTime;
 @SuperBuilder
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class BaseObject implements Serializable {
     @Id
@@ -27,7 +26,7 @@ public class BaseObject implements Serializable {
     @Enumerated(EnumType.STRING)
     protected ObjectState state;
 
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_date" , columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     protected ZonedDateTime createdDate;
 
@@ -37,4 +36,9 @@ public class BaseObject implements Serializable {
 
     @Column(name = "deleted_date")
     protected ZonedDateTime deletedDate;
+
+    public BaseObject() {
+        this.id = 0L;
+        this.state = ObjectState.ACTIVE;
+    }
 }

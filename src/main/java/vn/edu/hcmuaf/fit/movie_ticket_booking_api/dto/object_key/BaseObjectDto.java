@@ -26,6 +26,7 @@ public class BaseObjectDto {
     protected ZonedDateTime deletedDate;
 
     public BaseObjectDto() {
+        this.id = 0L;
         this.state = ObjectState.ACTIVE;
     }
 }
