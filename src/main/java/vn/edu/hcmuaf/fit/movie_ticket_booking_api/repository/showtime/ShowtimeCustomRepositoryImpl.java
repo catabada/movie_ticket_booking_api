@@ -29,6 +29,7 @@ public class ShowtimeCustomRepositoryImpl extends AbstractCustomRepository<Showt
         BooleanBuilder builder = buildConditionSearch(showtimeSearch);
         return queryFactory.selectFrom(qShowtime)
                 .where(builder)
+                .orderBy(qShowtime.startTime.asc())
                 .fetch();
     }
 
@@ -42,7 +43,7 @@ public class ShowtimeCustomRepositoryImpl extends AbstractCustomRepository<Showt
         }
         if (!ObjectUtils.isEmpty(showtimeSearch.getStartTime())) {
             builder.and(
-                    qShowtime.startTime.after(showtimeSearch.getStartTime())
+                    qShowtime.startTime.after(showtimeSearch.getStartTime()).and(qShowtime.startTime.before(showtimeSearch.getStartTime().plusDays(1)))
             );
         }
         return builder;

@@ -57,6 +57,9 @@ public class Invoice extends BaseObject {
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
     List<Ticket> tickets = new ArrayList<>();
 
+    @OneToMany(mappedBy = "invoice", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    List<InvoiceCombo> invoiceCombos = new ArrayList<>();
+
     public void addTicket(Ticket ticket) {
         if (tickets == null) {
             tickets = new ArrayList<>();
@@ -64,5 +67,14 @@ public class Invoice extends BaseObject {
 
         ticket.setInvoice(this);
         tickets.add(ticket);
+    }
+
+    public void addInvoiceCombo(InvoiceCombo invoiceCombo) {
+        if (invoiceCombos == null) {
+            invoiceCombos = new ArrayList<>();
+        }
+
+        invoiceCombo.setInvoice(this);
+        invoiceCombos.add(invoiceCombo);
     }
 }

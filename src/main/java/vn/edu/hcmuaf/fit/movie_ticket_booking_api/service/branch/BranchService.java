@@ -6,7 +6,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 import java.util.List;
 
 public interface BranchService {
-    List<BranchDto> getAllBranches();
+    List<BranchDto> getAllBranches(final BranchSearch search);
 
     BranchDto getBranchById(final Long id) throws BaseException;
 

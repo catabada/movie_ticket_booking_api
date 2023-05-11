@@ -25,8 +25,8 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
-    public List<BranchDto> getAllBranches() {
-        List<Branch> branchList = branchCustomRepository.findAll();
+    public List<BranchDto> getAllBranches(final BranchSearch search) {
+        List<Branch> branchList = branchCustomRepository.getBranchSearch(search);
         return branchMapper.toBranchDtoList(branchList);
     }
 

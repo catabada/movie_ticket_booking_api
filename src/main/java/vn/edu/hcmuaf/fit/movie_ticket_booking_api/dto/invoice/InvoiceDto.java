@@ -2,7 +2,6 @@ package vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
@@ -51,6 +50,9 @@ public class InvoiceDto extends BaseObjectDto {
 
     @JsonIgnoreProperties("invoice")
     List<TicketDto> tickets = new ArrayList<>();
+
+    @JsonIgnoreProperties("invoice")
+    List<InvoiceComboDto> invoiceCombos = new ArrayList<>();
 
     public void addTicket(TicketDto ticket) {
         if (tickets == null) {

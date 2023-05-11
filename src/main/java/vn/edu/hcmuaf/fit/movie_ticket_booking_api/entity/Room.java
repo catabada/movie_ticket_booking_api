@@ -41,5 +41,12 @@ public class Room extends BaseObject {
     private Branch branch;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
-    private List<Seat> seats = new ArrayList<>();
+    private Set<Seat> seats = new HashSet<>();
+
+    public void addSeat(Seat seat) {
+        if (seats == null) seats = new HashSet<>();
+
+        seats.add(seat);
+        seat.setRoom(this);
+    }
 }

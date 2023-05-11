@@ -11,6 +11,7 @@ public class SecurityConstant {
     public final static long EXPIRATION_TIME = 864000000L;
     public final static String[] PUBLIC_URLS = {
             "/**",
+            "/checkout/**",
             "/auth/resend-email/**",
             "/auth/register", "/auth/login", "/auth/login-facebook", "/auth/login-google",
             "/auth/verify-email/**",  "/user/image/profile/**",

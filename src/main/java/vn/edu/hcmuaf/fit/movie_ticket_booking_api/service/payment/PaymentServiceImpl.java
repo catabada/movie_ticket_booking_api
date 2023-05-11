@@ -91,6 +91,7 @@ public class PaymentServiceImpl implements PaymentService {
         String amount = 1000 + "";
         String orderInfo = "Thanh toán hóa đơn " + orderId;
         String requestType = "captureWallet";
+
         MomoRequest request = MomoRequest.builder()
                 .orderId(orderId)
                 .requestId(requestId)
@@ -112,6 +113,7 @@ public class PaymentServiceImpl implements PaymentService {
         request.setSignature(signature);
 
         String json = mapper.writeValueAsString(request);
+        System.out.println(json);
         String response = Request.Post(apiEndpoint)
                 .bodyString(json, ContentType.APPLICATION_JSON.withCharset(StandardCharsets.UTF_8))
                 .execute().returnContent().asString(StandardCharsets.UTF_8);

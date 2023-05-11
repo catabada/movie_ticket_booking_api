@@ -1,6 +1,5 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.controller;
 
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +12,10 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseSuccess;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.checkout.CheckoutService;
 
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/checkout")
+@CrossOrigin("*")
 public class CheckoutController {
     private final CheckoutService checkoutService;
 
@@ -38,7 +37,7 @@ public class CheckoutController {
         }
     }
 
-    @PostMapping("/momo/return")
+    @RequestMapping("/momo/return")
     public ResponseEntity<HttpResponse> returnByMomo(CaptureMoMoConfirmResponse captureMoMoConfirmResponse) throws Exception {
         checkoutService.returnByMomo(captureMoMoConfirmResponse);
         return ResponseEntity.ok(HttpResponseSuccess.success().build());
@@ -54,6 +53,7 @@ public class CheckoutController {
     @PostMapping("/cancel")
     public ResponseEntity<HttpResponse> cancelBooking() {
         // delete invoice
+        System.out.println("cancel");
         return ResponseEntity.ok(HttpResponseSuccess.success().build());
     }
 }
