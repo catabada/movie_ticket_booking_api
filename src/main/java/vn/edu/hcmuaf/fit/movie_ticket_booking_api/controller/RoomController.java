@@ -22,9 +22,9 @@ public class RoomController {
         this.roomService = roomService;
     }
 
-    @GetMapping
-    public ResponseEntity<HttpResponse> getAllRoom() {
-        List<RoomDto> roomDtoList = roomService.getAllRoom();
+    @RequestMapping("/search")
+    public ResponseEntity<HttpResponse> getAllRoom(@RequestBody RoomSearch search) {
+        List<RoomDto> roomDtoList = roomService.getAllRoom(search);
         return ResponseEntity.ok(HttpResponseSuccess.success(roomDtoList).build());
     }
 

@@ -43,6 +43,7 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final ShowtimeMapper showtimeMapper;
     private final TicketMapper ticketMapper;
     private final AppMailService appMailService;
+    private final InvoiceComboMapper invoiceComboMapper;
 
     @Autowired
     public CheckoutServiceImpl(AppUserCustomRepository appUserCustomRepository, InvoiceRepository invoiceRepository,
@@ -50,7 +51,8 @@ public class CheckoutServiceImpl implements CheckoutService {
                                TicketCustomRepository ticketCustomRepository, PaymentService paymentService,
                                AppUserMapper appUserMapper, InvoiceMapper invoiceMapper,
                                ShowtimeMapper showtimeMapper, TicketMapper ticketMapper,
-                               AppMailService appMailService
+                               AppMailService appMailService,
+                               InvoiceComboMapper invoiceComboMapper
     ) {
         this.appUserCustomRepository = appUserCustomRepository;
         this.invoiceRepository = invoiceRepository;
@@ -63,6 +65,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         this.showtimeMapper = showtimeMapper;
         this.ticketMapper = ticketMapper;
         this.appMailService = appMailService;
+        this.invoiceComboMapper = invoiceComboMapper;
     }
 
     private InvoiceDto checkout(InvoiceCreate invoiceCreate) throws Exception {
@@ -73,6 +76,7 @@ public class CheckoutServiceImpl implements CheckoutService {
                 .email(invoiceCreate.getEmail())
                 .paymentMethod(invoiceCreate.getPaymentMethod())
                 .paymentStatus(PaymentStatus.PENDING)
+                .invoiceCombos(invoiceComboMapper.toInvoiceComboList(invoiceCreate.getInvoiceCombos()))
                 .state(ObjectState.ACTIVE)
                 .build();
 
@@ -104,13 +108,20 @@ public class CheckoutServiceImpl implements CheckoutService {
             invoice.setAppUser(appUser);
         }
 
+        for(Ticket ticket : tickets) {
+            ticket.setInvoice(invoice);
+        }
 
-        tickets.forEach(invoice::addTicket);
+       for(InvoiceCombo invoiceCombo : invoice.getInvoiceCombos()) {
+           invoiceCombo.setInvoice(invoice);
+       }
 
         invoice.setCode(AppUtils.createInvoiceCode());
         invoice.setTickets(tickets);
 
-        invoice = invoiceRepository.save(invoice);
+        invoice.setInvoiceCombos(invoice.getInvoiceCombos());
+
+        invoice = invoiceRepository.saveAndFlush(invoice);
 
         return invoiceMapper.toInvoiceDto(invoice);
     }

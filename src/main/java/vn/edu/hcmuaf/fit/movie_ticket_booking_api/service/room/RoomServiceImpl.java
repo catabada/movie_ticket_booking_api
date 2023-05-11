@@ -32,8 +32,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<RoomDto> getAllRoom() {
-        List<Room> rooms = roomCustomRepository.findAll();
+    public List<RoomDto> getAllRoom(RoomSearch search) {
+        List<Room> rooms = roomCustomRepository.getRoomsSearch(search);
         return roomMapper.toRoomDtoList(rooms);
     }
 
@@ -55,16 +55,15 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomMapper.toRoom(roomCreate);
         room.setRoomState(RoomState.AVAILABLE);
 
-        Room newRoom = roomCustomRepository.save(room);
+        for (Seat seat : room.getSeats()) {
+            seat.setRoom(room);
+        }
 
-//        for (Seat seat : room.getSeats()) {
-//            seat.setRoom(newRoom);
-//        }
+        room.setSeats(room.getSeats());
 
-//        newRoom.setSeats(room.getSeats());
-//        newRoom = roomCustomRepository.save(newRoom);
+       room = roomCustomRepository.save(room);
 
-        return roomMapper.toRoomDto(newRoom);
+        return roomMapper.toRoomDto(room);
     }
 
     @Override

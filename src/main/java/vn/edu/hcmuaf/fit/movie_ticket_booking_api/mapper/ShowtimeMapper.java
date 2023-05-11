@@ -9,7 +9,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.*;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        uses = {RoomMapper.class, MovieGenreMapper.class, TicketMapper.class}
+        uses = {RoomMapper.class, MovieGenreMapper.class, TicketMapper.class, InvoiceComboMapper.class  }
 )
 public interface ShowtimeMapper {
 
@@ -17,6 +17,7 @@ public interface ShowtimeMapper {
     @Mapping(target = "room", source = "room", qualifiedByName = "toRoomDto")
     @Mapping(target = "movie", source = "movie", qualifiedByName = "toMovieDto")
     @Mapping(target = "invoices.showtime", ignore = true)
+    @Mapping(target= "invoices.invoiceCombos", ignore = true)
     ShowtimeDto toShowtimeDto(final Showtime showtime);
 
     @Named("toShowtimeDtoWithoutInvoices")
@@ -34,5 +35,6 @@ public interface ShowtimeMapper {
 
     @Mapping(target = "showtime", ignore = true)
     @Mapping(target = "tickets", source = "tickets", qualifiedByName = "toTicketDto")
+    @Mapping(target = "invoiceCombos", source = "invoiceCombos", qualifiedByName = "toInvoiceComboDtoWithoutInvoice")
     InvoiceDto toInvoiceDto(final Invoice invoice);
 }

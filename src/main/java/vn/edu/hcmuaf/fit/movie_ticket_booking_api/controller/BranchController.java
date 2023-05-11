@@ -22,9 +22,9 @@ public class BranchController {
         this.branchService = branchService;
     }
 
-    @GetMapping
-    public ResponseEntity<HttpResponse> getAllBranches() {
-        List<BranchDto> branchDtoList = branchService.getAllBranches();
+    @RequestMapping("/search")
+    public ResponseEntity<HttpResponse> getAllBranches(@RequestBody BranchSearch search) {
+        List<BranchDto> branchDtoList = branchService.getAllBranches(search);
         return ResponseEntity.ok(HttpResponseSuccess.success(branchDtoList).build());
     }
 
