@@ -11,6 +11,9 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface BranchCustomRepository extends ICustomRepository<Branch, Long> {
     Optional<Branch> findByName(String name);
+    Optional<Branch> getBranch(Long id);
 
     List<Branch> getBranchSearch(BranchSearch search);
+
+
 }

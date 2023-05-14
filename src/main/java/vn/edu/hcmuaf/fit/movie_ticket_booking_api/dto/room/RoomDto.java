@@ -1,7 +1,6 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.room;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -24,6 +23,11 @@ public class RoomDto extends BaseObjectDto {
     private int row;
     @NotNull
     private int col;
+
+    private List<Integer> laneRows;
+
+
+    private List<Integer> laneCols;
     @NotNull
     private int totalSeat;
     private RoomState roomState;

@@ -25,6 +25,15 @@ public class Room extends BaseObject {
     @Column(name = "col", nullable = false)
     private int col;
 
+    @Column(name = "lane_row")
+    @ElementCollection(targetClass = Integer.class)
+    private List<Integer> laneRows;
+
+
+    @Column(name = "lane_col")
+    @ElementCollection(targetClass = Integer.class)
+    private List<Integer> laneCols;
+
     @Column(name = "total_seat", nullable = false)
     private int totalSeat;
 

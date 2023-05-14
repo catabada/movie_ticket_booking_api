@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.BranchStatus;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.branch.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Branch;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.BranchMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.branch.BranchCustomRepository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,9 +41,6 @@ public class BranchServiceImpl implements BranchService {
     @Override
     @Transactional
     public BranchDto createBranch(BranchCreate branchCreate) throws BaseException {
-//        if (branchCreate.getBranch() == null) {
-//            throw new BaseException("Branch is null");
-//        }
 
         // check if branch exists
         Optional<Branch> branch = branchCustomRepository.findByName(branchCreate.getName());
@@ -50,8 +49,6 @@ public class BranchServiceImpl implements BranchService {
             throw new BadRequestException("Branch already exists");
         }
 
-        branchCreate.setBranchStatus(BranchStatus.ACTIVE);
-
         Branch newBranch = branchCustomRepository.saveAndFlush(branchMapper.toBranch(branchCreate));
 
         return branchMapper.toBranchDto(newBranch);
@@ -59,19 +56,24 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public BranchDto updateBranch(BranchUpdate branchUpdate) throws BaseException {
-        if (branchUpdate == null) {
-            throw new BaseException("Branch is null");
-        }
+        Branch branch = branchCustomRepository.getBranch(branchUpdate.getId()).orElseThrow(
+                () -> new BadRequestException("Không tìm thấy")
+        );
 
-        Branch branch = branchMapper.toBranch(branchUpdate);
-
-        Branch updatedBranch = branchCustomRepository.save(branch);
+        Branch updatedBranch = branchCustomRepository.save(branchMapper.toBranch(branchUpdate));
 
         return branchMapper.toBranchDto(updatedBranch);
     }
 
     @Override
     public void deleteBranch(Long id) throws BaseException {
-        branchCustomRepository.deleteById(id);
+        Branch branch = branchCustomRepository.getBranch(id).orElseThrow(
+                () -> new BadRequestException("Không tìm thấy")
+        );
+
+        branch.setState(ObjectState.DELETED);
+        branch.setDeletedDate(ZonedDateTime.now());
+
+        branchCustomRepository.saveAndFlush(branch);
     }
 }

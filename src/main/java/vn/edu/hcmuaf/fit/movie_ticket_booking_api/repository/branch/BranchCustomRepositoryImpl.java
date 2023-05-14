@@ -34,6 +34,7 @@ public class BranchCustomRepositoryImpl extends AbstractCustomRepository<Branch,
     public List<Branch> findAll() {
         return queryFactory
                 .selectFrom(qBranch)
+                .leftJoin(qBranch.rooms, qRoom)
                 .orderBy(qBranch.id.asc())
                 .fetch();
     }
@@ -47,12 +48,22 @@ public class BranchCustomRepositoryImpl extends AbstractCustomRepository<Branch,
     }
 
     @Override
+    public Optional<Branch> getBranch(Long id) {
+        return Optional.ofNullable(
+                queryFactory
+                        .selectFrom(qBranch)
+                        .where(qBranch.id.eq(id).and(qBranch.state.ne(ObjectState.DELETED)))
+                        .fetchOne()
+        );
+    }
+
+    @Override
     public List<Branch> getBranchSearch(BranchSearch search) {
         BooleanBuilder booleanBuilder = buildCondition(search);
         return queryFactory
                 .selectFrom(qBranch)
-                .innerJoin(qBranch.rooms, qRoom)
-                .where(booleanBuilder.and(qRoom.state.ne(ObjectState.DELETED)))
+                .leftJoin(qBranch.rooms, qRoom)
+                .where(booleanBuilder)
                 .fetch();
     }
 

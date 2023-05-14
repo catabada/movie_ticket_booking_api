@@ -8,6 +8,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.combo.ComboDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.combo.ComboItemDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.product.ProductDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Combo;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.ComboItem;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Product;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.NotFoundException;
@@ -50,7 +51,16 @@ public class ComboServiceImpl implements ComboService {
     @Transactional
     public ComboDto createCombo(ComboDto comboDto) throws BadRequestException {
 
-        Combo combo = comboCustomRepository.saveAndFlush(comboMapper.toCombo(comboDto));
+        Combo combo = comboMapper.toCombo(comboDto);
+
+        for(ComboItem item : combo.getComboItems()) {
+            item.setCombo(combo);
+        }
+
+        combo.setComboItems(combo.getComboItems());
+
+        combo = comboCustomRepository.saveAndFlush(combo);
+
         if (ObjectUtils.isEmpty(combo)) throw new BadRequestException("Tạo dữ liệu không thành công");
 
         return comboMapper.toComboDto(combo);

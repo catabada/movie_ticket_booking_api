@@ -34,19 +34,19 @@ public class RoomController {
         return ResponseEntity.ok(HttpResponseSuccess.success(roomDto).build());
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<HttpResponse> createRoom(@RequestBody @Valid RoomCreate roomCreate) throws BaseException {
         RoomDto roomDto = roomService.createRoom(roomCreate);
         return ResponseEntity.ok(HttpResponseSuccess.success(roomDto).build());
     }
 
-    @PutMapping
+    @PutMapping("/update")
     public ResponseEntity<HttpResponse> updateRoom(@RequestBody @Valid RoomUpdate roomUpdate) throws BaseException {
         RoomDto roomDto = roomService.updateRoom(roomUpdate);
         return ResponseEntity.ok(HttpResponseSuccess.success(roomDto).build());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<HttpResponse> deleteRoom(@PathVariable("id") Long id) throws BaseException {
         roomService.deleteRoom(id);
         return ResponseEntity.ok(HttpResponseSuccess.success().build());

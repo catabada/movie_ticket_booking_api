@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.showtime.*;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseSuccess;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.showtime.ShowtimeService;
@@ -33,20 +34,20 @@ public class ShowtimeController {
         return ResponseEntity.ok(HttpResponseSuccess.success(showtimeDto).build());
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<HttpResponse> createShowtime(@RequestBody @Valid ShowtimeCreate showtimeCreate) {
         ShowtimeDto showtimeDto = showtimeService.createShowtime(showtimeCreate);
         return ResponseEntity.ok(HttpResponseSuccess.success(showtimeDto).build());
     }
 
-    @PutMapping
-    public ResponseEntity<HttpResponse> updateShowtime(@RequestBody @Valid ShowtimeUpdate showtimeUpdate) {
+    @PutMapping("/update")
+    public ResponseEntity<HttpResponse> updateShowtime(@RequestBody @Valid ShowtimeUpdate showtimeUpdate) throws BadRequestException {
         ShowtimeDto showtimeDto = showtimeService.updateShowtime(showtimeUpdate);
         return ResponseEntity.ok(HttpResponseSuccess.success(showtimeDto).build());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpResponse> deleteShowtime(@PathVariable("id") Long id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<HttpResponse> deleteShowtime(@PathVariable("id") Long id) throws BadRequestException {
         showtimeService.deleteShowtime(id);
         return ResponseEntity.ok(HttpResponseSuccess.success("Delete showtime successfully").build());
     }

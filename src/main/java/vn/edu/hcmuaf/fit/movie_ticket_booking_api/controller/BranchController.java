@@ -34,19 +34,19 @@ public class BranchController {
         return ResponseEntity.ok(HttpResponseSuccess.success(branchDto).build());
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<HttpResponse> createBranch(@RequestBody @Valid BranchCreate branchCreate) throws BaseException {
         BranchDto branchDto = branchService.createBranch(branchCreate);
         return ResponseEntity.ok(HttpResponseSuccess.success(branchDto).build());
     }
 
-    @PutMapping
+    @PutMapping("/update")
     public ResponseEntity<HttpResponse> updateBranch(@RequestBody @Valid BranchUpdate branchUpdate) throws BaseException {
         BranchDto updatedBranch = branchService.updateBranch(branchUpdate);
         return ResponseEntity.ok(HttpResponseSuccess.success(updatedBranch).build());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<HttpResponse> deleteBranch(@PathVariable("id") Long id) throws BaseException {
         branchService.deleteBranch(id);
         return ResponseEntity.ok(HttpResponseSuccess.success().build());
