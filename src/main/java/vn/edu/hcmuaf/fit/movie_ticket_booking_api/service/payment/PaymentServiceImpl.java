@@ -87,8 +87,8 @@ public class PaymentServiceImpl implements PaymentService {
         ObjectMapper mapper = new ObjectMapper();
 
         String orderId = invoice.getCode();
-        String requestId = String.valueOf(System.currentTimeMillis());
-        String amount = 1000 + "";
+        String requestId = UUID.randomUUID().toString();
+        Long amount = 10000L;
         String orderInfo = "Thanh toán hóa đơn " + orderId;
         String requestType = "captureWallet";
 
@@ -113,7 +113,6 @@ public class PaymentServiceImpl implements PaymentService {
         request.setSignature(signature);
 
         String json = mapper.writeValueAsString(request);
-        System.out.println(json);
         String response = Request.Post(apiEndpoint)
                 .bodyString(json, ContentType.APPLICATION_JSON.withCharset(StandardCharsets.UTF_8))
                 .execute().returnContent().asString(StandardCharsets.UTF_8);

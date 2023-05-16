@@ -14,12 +14,10 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseSuccess;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.movie.MovieService;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/movie")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MovieController {
     private final MovieService movieService;
 

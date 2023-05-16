@@ -1,7 +1,14 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.app_user;
 
+import com.google.gson.Gson;
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
+import com.restfb.Parameter;
+import com.restfb.Version;
+import org.apache.http.client.fluent.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +27,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.user_info.UserInfoDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.user_info.UserInfoUpdate;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.AppRole;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.AppUser;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.UserInfo;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.VerificationToken;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
@@ -35,7 +43,10 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.verification_token.
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.app_mail.AppMailService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.AppUtils;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,6 +63,9 @@ public class AppUserServiceImpl implements AppUserService {
     private final AppUserMapper appUserMapper;
     private final UserInfoMapper userInfoMapper;
     private final FileService imageFileService;
+
+    @Value("${facebook.appSecret}")
+    private String appSecret;
 
     @Autowired
     public AppUserServiceImpl(AppUserCustomRepository appUserCustomRepository,
@@ -106,7 +120,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public void verifyEmail(String token) throws BaseException {
+    public Boolean verifyEmail(String token) throws BaseException {
         try {
             VerificationToken verificationToken = verificationTokenCustomRepository.getVerificationTokenByToken(UUID.fromString(token))
                     .orElseThrow(() -> new BadRequestException("Token không hợp lệ"));
@@ -118,8 +132,9 @@ public class AppUserServiceImpl implements AppUserService {
             verificationToken.setIsVerified(true);
             verificationToken.getAppUser().setEnabled(true);
             verificationTokenCustomRepository.saveAndFlush(verificationToken);
+            return true;
         } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
+            return false;
         }
     }
 
@@ -162,6 +177,111 @@ public class AppUserServiceImpl implements AppUserService {
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
+    }
+
+    @Override
+    public UserLoginResponse loginWithFacebook(String accessToken) throws BaseException {
+        try {
+            AppUserFacebook appUserFacebook = getFacebookProfile(accessToken);
+            if (appUserFacebook == null) {
+                throw new BadRequestException("Không thể lấy thông tin người dùng");
+            }
+
+            AppUser appUser = appUserCustomRepository.getUserByFacebookId(appUserFacebook.getId()).orElse(null);
+            if (appUser == null) {
+                appUser = appUserCustomRepository.getUserByEmail(appUserFacebook.getEmail()).orElse(null);
+                if (appUser == null) {
+                    appUser = new AppUser();
+                    appUser.setEmail(appUserFacebook.getEmail());
+                    appUser.setAccountNonLocked(true);
+                    appUser.setEnabled(true);
+
+                    AppRole defaultRole = appRoleRepository.getByName(RoleConstant.ROLE_MEMBER)
+                            .orElseThrow(() -> new BadRequestException("Không tìm thấy role member"));
+                    appUser.setAppRoles(new HashSet<>(Collections.singletonList(defaultRole)));
+
+                    appUser.setUserInfo(new UserInfo());
+                    appUser.getUserInfo().setFullName(appUserFacebook.getName());
+                    // appUser.getUserInfo().setIsMale(appUserFacebook.getGender().equalsIgnoreCase("male"));
+                    appUser.getUserInfo().setDateOfBirth(appUserFacebook.getBirthdayAsDate());
+                    appUser.getUserInfo().setAvatar(appUserFacebook.getPicture().getUrl());
+
+                }
+
+                appUser.setFacebookId(appUserFacebook.getId());
+                appUser = appUserCustomRepository.saveAndFlush(appUser);
+            }
+
+            AppUserDomain appUserDomain = new AppUserDomain(appUser);
+
+            return UserLoginResponse.builder()
+                    .userId(appUserDomain.getUserId())
+                    .token(appJwtTokenProvider.generateJwtToken(appUserDomain))
+                    .email(appUserDomain.getEmail())
+                    .fullName(appUserDomain.getFullName())
+                    .avatar(appUserDomain.getAvatar())
+                    .build();
+        } catch (Exception e) {
+            throw new BadRequestException("Đăng nhập không thành công");
+        }
+    }
+
+    private AppUserFacebook getFacebookProfile(String accessToken) {
+        FacebookClient facebookClient = new DefaultFacebookClient(accessToken, appSecret, Version.LATEST);
+        return facebookClient.fetchObject("me", AppUserFacebook.class, Parameter.with("fields", "id,name,email,first_name,last_name,picture.width(250).height(250),birthday,gender"));
+    }
+
+    @Override
+    public UserLoginResponse loginWithGoogle(String accessToken) throws BaseException {
+        try {
+            AppUserGoogle appUserGoogle = getGoogleProfile(accessToken);
+            if (appUserGoogle == null) {
+                throw new BadRequestException("Không thể lấy thông tin người dùng");
+            }
+
+            AppUser appUser = appUserCustomRepository.getUserByGoogleId(appUserGoogle.getSub()).orElse(null);
+            if (appUser == null) {
+                appUser = appUserCustomRepository.getUserByEmail(appUserGoogle.getEmail()).orElse(null);
+                if (appUser == null) {
+                    appUser = new AppUser();
+                    appUser.setEmail(appUserGoogle.getEmail());
+                    appUser.setAccountNonLocked(true);
+                    appUser.setEnabled(true);
+                    appUser.setUserInfo(new UserInfo());
+                    appUser.getUserInfo().setFullName(appUserGoogle.getName());
+                    appUser.getUserInfo().setAvatar(appUserGoogle.getPicture());
+
+                    AppRole defaultRole = appRoleRepository.getByName(RoleConstant.ROLE_MEMBER).orElse(null);
+                    if (defaultRole == null) {
+                        throw new BadRequestException("Không tìm thấy role mặc định");
+                    }
+
+                    appUser.setAppRoles(new HashSet<>(Collections.singletonList(defaultRole)));
+
+                }
+
+                appUser.setGoogleId(appUserGoogle.getSub());
+                appUser = appUserCustomRepository.saveAndFlush(appUser);
+            }
+
+            AppUserDomain appUserDomain = new AppUserDomain(appUser);
+
+            return UserLoginResponse.builder()
+                    .userId(appUser.getId())
+                    .token(appJwtTokenProvider.generateJwtToken(appUserDomain))
+                    .email(appUser.getEmail())
+                    .fullName(appUser.getUserInfo().getFullName())
+                    .avatar(appUser.getUserInfo().getAvatar())
+                    .build();
+        } catch (Exception e) {
+            throw new BadRequestException("Đăng nhập không thành công");
+        }
+    }
+
+    private AppUserGoogle getGoogleProfile(String accessToken) throws IOException {
+        String link = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + accessToken;
+        String response = Request.Get(link).execute().returnContent().asString();
+        return new Gson().fromJson(response, AppUserGoogle.class);
     }
 
     @Override

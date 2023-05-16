@@ -14,7 +14,7 @@ public class MomoRequest {
     private String ipnUrl;
     private String redirectUrl;
     private String orderId;
-    private String amount;
+    private Long amount;
     private String lang;
     private Boolean autoCapture;
     private String orderInfo;
