@@ -38,7 +38,7 @@ public class CheckoutController {
     }
 
     @RequestMapping("/momo/return")
-    public ResponseEntity<HttpResponse> returnByMomo(CaptureMoMoConfirmResponse captureMoMoConfirmResponse) throws Exception {
+    public ResponseEntity<HttpResponse> returnByMomo(@RequestBody CaptureMoMoConfirmResponse captureMoMoConfirmResponse) throws Exception {
         checkoutService.returnByMomo(captureMoMoConfirmResponse);
         return ResponseEntity.ok(HttpResponseSuccess.success().build());
     }

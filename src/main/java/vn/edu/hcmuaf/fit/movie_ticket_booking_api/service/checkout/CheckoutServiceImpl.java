@@ -4,10 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.NoticeType;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.PaymentStatus;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoleConstant;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.*;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.notice.NoticeDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.payment.CaptureMoMoConfirmResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.payment.MomoResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.seat.SeatDto;
@@ -22,12 +25,14 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.seat.SeatCustomRepo
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.showtime.ShowtimeCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.ticket.TicketCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.app_mail.AppMailService;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.notice.NoticeService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.payment.PaymentService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.*;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -44,6 +49,8 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final TicketMapper ticketMapper;
     private final AppMailService appMailService;
     private final InvoiceComboMapper invoiceComboMapper;
+    private final NoticeService noticeService;
+    private final NoticeMapper noticeMapper;
 
     @Autowired
     public CheckoutServiceImpl(AppUserCustomRepository appUserCustomRepository, InvoiceRepository invoiceRepository,
@@ -52,7 +59,9 @@ public class CheckoutServiceImpl implements CheckoutService {
                                AppUserMapper appUserMapper, InvoiceMapper invoiceMapper,
                                ShowtimeMapper showtimeMapper, TicketMapper ticketMapper,
                                AppMailService appMailService,
-                               InvoiceComboMapper invoiceComboMapper
+                               InvoiceComboMapper invoiceComboMapper,
+                               NoticeService noticeService,
+                               NoticeMapper noticeMapper
     ) {
         this.appUserCustomRepository = appUserCustomRepository;
         this.invoiceRepository = invoiceRepository;
@@ -66,6 +75,8 @@ public class CheckoutServiceImpl implements CheckoutService {
         this.ticketMapper = ticketMapper;
         this.appMailService = appMailService;
         this.invoiceComboMapper = invoiceComboMapper;
+        this.noticeService = noticeService;
+        this.noticeMapper = noticeMapper;
     }
 
     private InvoiceDto checkout(InvoiceCreate invoiceCreate) throws Exception {
@@ -108,13 +119,13 @@ public class CheckoutServiceImpl implements CheckoutService {
             invoice.setAppUser(appUser);
         }
 
-        for(Ticket ticket : tickets) {
+        for (Ticket ticket : tickets) {
             ticket.setInvoice(invoice);
         }
 
-       for(InvoiceCombo invoiceCombo : invoice.getInvoiceCombos()) {
-           invoiceCombo.setInvoice(invoice);
-       }
+        for (InvoiceCombo invoiceCombo : invoice.getInvoiceCombos()) {
+            invoiceCombo.setInvoice(invoice);
+        }
 
         invoice.setCode(AppUtils.createInvoiceCode());
         invoice.setTickets(tickets);
@@ -135,6 +146,22 @@ public class CheckoutServiceImpl implements CheckoutService {
     public void returnByMomo(CaptureMoMoConfirmResponse captureMoMoConfirmResponse) throws Exception {
         Invoice invoice = invoiceRepository.findByCode(captureMoMoConfirmResponse.getOrderId())
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy hóa đơn"));
+
+        Optional<AppUser> optional = appUserCustomRepository.getUserByEmail(invoice.getEmail());
+        if (optional.isPresent()) {
+            NoticeDto notice = NoticeDto.builder()
+                    .id(0L)
+                    .description("Bạn đã đặt vé thành công với hóa đơn " + invoice.getCode())
+                    .type(NoticeType.BOOKED)
+                    .isRead(false)
+                    .state(ObjectState.ACTIVE)
+                    .appUser(AppUserDto.builder().email(optional.get().getEmail()).build())
+                    .build();
+
+            noticeService.createNotice(notice);
+        } else {
+            throw new BadRequestException("Không tìm thấy người dùng");
+        }
 
         InvoiceDto invoiceDto = invoiceMapper.toInvoiceDto(invoice);
         if (captureMoMoConfirmResponse.getResultCode() == 0) {

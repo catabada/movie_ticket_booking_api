@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.BaseObject;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Invoice;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Notice;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -49,4 +50,7 @@ public class AppUser extends BaseObject implements Serializable {
     @JsonIgnoreProperties("appUser")
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
     private Set<Invoice> invoices;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
+    private Set<Notice> notices;
 }
