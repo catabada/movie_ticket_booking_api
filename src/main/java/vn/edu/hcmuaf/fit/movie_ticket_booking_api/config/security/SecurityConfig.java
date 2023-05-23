@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -22,6 +24,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.config.filter.JwtAuthorization
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.BeanIdConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoleConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.SecurityConstant;
+
 
 @Configuration
 @EnableWebSecurity
@@ -79,10 +82,13 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(SecurityConstant.PUBLIC_URLS).permitAll()
+                .requestMatchers(SecurityConstant.AUTHENTICATION_URLS).permitAll()
                 .requestMatchers(HttpMethod.GET, SecurityConstant.PUBLIC_GET_URLS).permitAll()
+                .requestMatchers(SecurityConstant.REQUIRE_MANAGER_ROLE_URLS).hasRole(RoleConstant.BASE_ROLE_MANAGER_NAME)
                 .requestMatchers(SecurityConstant.REQUIRE_ADMIN_ROLE_URLS).hasRole(RoleConstant.BASE_ROLE_ADMIN_NAME)
                 .anyRequest().authenticated()
                 .and()
+                .authenticationManager(authManager(http))
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
@@ -97,5 +103,13 @@ public class SecurityConfig {
                 .ignoring()
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico");
     }
-
+    @Bean
+    HttpFirewall httpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        firewall.setAllowBackSlash(true);
+        firewall.setAllowUrlEncodedSlash(true);
+        firewall.setAllowUrlEncodedDoubleSlash(true);
+        firewall.setAllowUrlEncodedPercent(true);
+        return firewall;
+    }
 }

@@ -23,13 +23,14 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         HttpResponse httpResponse = HttpResponseError.error(HttpStatus.FORBIDDEN,
-                HttpStatus.FORBIDDEN.getReasonPhrase(), "You do not have permission to access this page").build();
+                HttpStatus.FORBIDDEN.getReasonPhrase(), "Bạn không đủ quyền để truy cập vào trang này.").build();
 
         response.setContentType("application/json");
         response.setStatus(HttpStatus.FORBIDDEN.value());
 
         OutputStream outputStream = response.getOutputStream();
         ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
         mapper.writeValue(outputStream, httpResponse);
         outputStream.flush();
     }

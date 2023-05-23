@@ -10,15 +10,16 @@ public class SecurityConstant {
     //10 days
     public final static long EXPIRATION_TIME = 864000000L;
     public final static String[] PUBLIC_URLS = {
-            "/**",
+            "/**/search",
             "/checkout/**",
-            "/auth/resend-email/**",
-            "/auth/register", "/auth/login", "/auth/login-facebook", "/auth/login-google",
-            "/auth/verify-email/**",  "/user/image/profile/**",
-            "/user/image/**", "/user/image/**", "/auth/forgot-password/**",
-            "/checkout/**",
-            "/swagger-ui/**", "/webjars/**", "/v3/**", "/swagger-resources/**",
-            "/ticket/booking", "/showtime/**", "/**",
+//            "/user/image/profile/**",
+//            "/user/image/**", "/user/image/**",
+//            "/swagger-ui/**", "/webjars/**", "/v3/**", "/swagger-resources/**",
+    };
+    public final static String[] AUTHENTICATION_URLS = {
+            "/auth/resend-email/**", "/auth/verify-email/**",
+            "/auth/register", "/auth/login", "/auth/forgot-password",
+            "/auth/reset-password", "/auth/login-facebook", "/auth/login-google",
     };
 
     public final static String[] PUBLIC_GET_URLS = {
@@ -30,9 +31,12 @@ public class SecurityConstant {
     };
 
     public final static String[] REQUIRE_ADMIN_ROLE_URLS = {
-            "/user/update-status",
-            "/user/admin",
-            "/app-status/**",
+            "/user/search",
+    };
+    public final static String[] REQUIRE_MANAGER_ROLE_URLS = {
+            "/**/create",
+            "/**/update",
+            "/**/delete",
     };
 
 }

@@ -21,8 +21,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     //resolve exception will be handled in global AuthenticationException
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        HttpResponse httpResponse = HttpResponseError.error(HttpStatus.UNAUTHORIZED, HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                "You need to login to access this page").build();
+        HttpResponse httpResponse = HttpResponseError.error(HttpStatus.UNAUTHORIZED, "Chưa xác thực!",
+                "Bạn cần phải đăng nhập để sử dụng dịch vụ này.").build();
 
         response.setContentType("application/json");
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
