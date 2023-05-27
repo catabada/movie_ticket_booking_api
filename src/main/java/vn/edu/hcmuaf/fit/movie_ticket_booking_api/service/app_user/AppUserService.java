@@ -15,6 +15,7 @@ public interface AppUserService extends UserDetailsService {
     void resendEmailVerifyRegister(final String email) throws BaseException;
 
     UserLoginResponse login(final UserLoginRequest loginRequest) throws BaseException;
+    UserLoginResponse loginAdmin(final UserLoginRequest loginRequest) throws BaseException;
 
     void updateProfile(final UserInfoUpdate userInfoUpdate) throws BaseException;
 

@@ -170,6 +170,45 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     @Transactional
+    public UserLoginResponse loginAdmin(UserLoginRequest loginRequest) throws BaseException {
+        try {
+            AppUserDomain appUserDomain = (AppUserDomain) loadUserByUsername(loginRequest.getEmail());
+            if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), appUserDomain.getPassword())) {
+                throw new BadRequestException("Email hoặc mật khẩu không đúng");
+            }
+
+            if (!appUserDomain.isAccountNonLocked()) {
+                throw new BadRequestException("Tài khoản của bạn đã bị khóa");
+            }
+
+            if (!appUserDomain.isEnabled()) {
+                throw new BadRequestException("Vui lòng xác thực email của bạn");
+            }
+            System.out.println(appUserDomain.getAuthorities());
+
+            if (appUserDomain.getAuthorities().stream()
+                    .noneMatch(
+                            role -> role.getAuthority().equals(RoleConstant.ROLE_ADMIN)
+                                    || role.getAuthority().equals(RoleConstant.ROLE_MANAGER)
+                    )
+            ) {
+                throw new BadRequestException("Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ với quản trị viên để được hỗ trợ");
+            }
+
+            // Generate token
+            String userToken = appJwtTokenProvider.generateJwtToken(appUserDomain);
+
+            return UserLoginResponse.builder()
+                    .userId(appUserDomain.getUserId())
+                    .token(userToken)
+                    .email(appUserDomain.getEmail()).build();
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
     public void updateProfile(UserInfoUpdate userInfoUpdate) throws BaseException {
         if (!AppUtils.getCurrentEmail().equals(userInfoUpdate.getEmail()))
             throw new BadRequestException("You should login to update your profile");

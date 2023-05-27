@@ -88,7 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         String orderId = invoice.getCode();
         String requestId = String.valueOf(System.currentTimeMillis());
-        String amount = 1000 + "";
+        String amount = String.valueOf(invoice.getTotalPrice());
         String orderInfo = "Thanh toán hóa đơn " + orderId;
         String requestType = "captureWallet";
 

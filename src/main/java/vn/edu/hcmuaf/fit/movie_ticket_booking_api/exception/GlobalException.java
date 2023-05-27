@@ -28,7 +28,7 @@ public class GlobalException {
             stringBuilder.append(error.getDefaultMessage()).append(", ");
         }
         String errorMessage = stringBuilder.substring(0, stringBuilder.length() - 2);
-        return ResponseEntity.ok(HttpResponseError.error(HttpStatus.BAD_REQUEST, errorMessage.toString()).build());
+        return ResponseEntity.ok(HttpResponseError.error(HttpStatus.BAD_REQUEST, errorMessage).build());
     }
 
     @ExceptionHandler(NotFoundException.class)

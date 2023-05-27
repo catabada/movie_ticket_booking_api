@@ -12,6 +12,7 @@ public class SecurityConstant {
     public final static String[] PUBLIC_URLS = {
             "/**/search",
             "/checkout/**",
+            "/notice/read",
 //            "/user/image/profile/**",
 //            "/user/image/**", "/user/image/**",
 //            "/swagger-ui/**", "/webjars/**", "/v3/**", "/swagger-resources/**",
@@ -20,6 +21,7 @@ public class SecurityConstant {
             "/auth/resend-email/**", "/auth/verify-email/**",
             "/auth/register", "/auth/login", "/auth/forgot-password",
             "/auth/reset-password", "/auth/login-facebook", "/auth/login-google",
+            "/admin/login",
     };
 
     public final static String[] PUBLIC_GET_URLS = {

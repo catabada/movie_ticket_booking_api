@@ -54,7 +54,8 @@ public class ShowtimeCustomRepositoryImpl extends AbstractCustomRepository<Showt
         }
         if (!ObjectUtils.isEmpty(showtimeSearch.getStartTime())) {
             builder.and(
-                    qShowtime.startTime.after(showtimeSearch.getStartTime()).and(qShowtime.startTime.before(showtimeSearch.getStartTime().plusDays(1)))
+                    qShowtime.startTime.after(showtimeSearch.getStartTime())
+                            .and(qShowtime.startTime.dayOfMonth().eq(showtimeSearch.getStartTime().plusHours(7).getDayOfMonth()))
             );
         }
         return builder.and(qShowtime.state.ne(ObjectState.DELETED));

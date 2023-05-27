@@ -15,7 +15,6 @@ import java.util.List;
 public class InvoiceCreate extends InvoiceDto {
 
     @NotNull
-    @Transient
     List<SeatDto> seats;
 
 }

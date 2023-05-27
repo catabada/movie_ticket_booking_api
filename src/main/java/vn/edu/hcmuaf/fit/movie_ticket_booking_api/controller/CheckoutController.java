@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class CheckoutController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpResponse> checkout(@RequestBody InvoiceCreate invoiceCreate, HttpServletRequest request) throws Exception {
+    public ResponseEntity<HttpResponse> checkout(@RequestBody @Valid InvoiceCreate invoiceCreate, HttpServletRequest request) throws Exception {
         switch (invoiceCreate.getPaymentMethod()) {
             case MOMO -> {
                 return ResponseEntity.ok(HttpResponseSuccess.success(checkoutService.checkoutMomo(invoiceCreate)).build());

@@ -139,6 +139,7 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Override
     public MomoResponse checkoutMomo(InvoiceCreate invoiceCreate) throws Exception {
+        System.out.println("invoice: " + invoiceCreate.toString());
         return paymentService.createMomoCapturePayment(checkout(invoiceCreate));
     }
 
