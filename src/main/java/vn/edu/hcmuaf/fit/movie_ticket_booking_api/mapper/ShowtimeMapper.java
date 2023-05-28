@@ -21,7 +21,7 @@ public interface ShowtimeMapper {
     ShowtimeDto toShowtimeDto(final Showtime showtime);
 
     @Named("toShowtimeDtoWithoutInvoices")
-    @Mapping(target = "room", source = "room", qualifiedByName = "toRoomDto")
+    @Mapping(target = "room", source = "room", qualifiedByName = "toRoomDtoWithoutSeats")
     @Mapping(target = "movie", source = "movie", qualifiedByName = "toMovieDto")
     @Mapping(target = "invoices", ignore = true)
     ShowtimeDto toShowtimeDtoWithoutInvoices(final Showtime showtime);

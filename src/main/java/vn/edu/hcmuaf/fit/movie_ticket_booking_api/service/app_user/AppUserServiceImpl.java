@@ -389,7 +389,7 @@ public class AppUserServiceImpl implements AppUserService {
             throw new BadRequestException("Please verify your email");
         }
 
-        return userInfoMapper.toUserInfoDto(appUser.getUserInfo());
+        return userInfoMapper.toUserInfoDto(appUser);
     }
 
     @Override

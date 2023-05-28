@@ -22,6 +22,11 @@ public interface RoomMapper {
     @Mapping(target = "seats", source = "seats", qualifiedByName = "toSeatDtoWithoutRoom")
     RoomDto toRoomDtoWithoutBranch(final Room room);
 
+    @Named("toRoomDtoWithoutSeats")
+    @Mapping(target = "seats", ignore = true)
+    @Mapping(target = "branch.rooms", ignore = true)
+    RoomDto toRoomDtoWithoutSeats(final Room room);
+
     Room toRoom(final RoomDto roomDto);
 
     @IterableMapping(qualifiedByName = "toRoomDto")

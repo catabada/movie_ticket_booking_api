@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.user_info;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -8,10 +9,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.object_key.BaseObjectDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Invoice;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.infrastructure.DateConstant;
 
-import java.util.Date;
+import java.util.*;
 
 @Getter
 @Setter
@@ -28,6 +31,9 @@ public class UserInfoDto extends BaseObjectDto {
     @DateConstant
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone = "Asia/Ho_Chi_Minh")
     protected Date dateOfBirth;
+
+    @JsonIgnoreProperties("appUser")
+    private Set<InvoiceDto> invoices = new HashSet<>();
 
     public UserInfoDto() {
         this.fullName = "";

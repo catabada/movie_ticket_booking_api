@@ -26,6 +26,7 @@ public class ShowtimeDto extends BaseObjectDto {
     private MovieDto movie;
 
     @NotNull
+    @JsonIgnoreProperties("showtimes")
     private RoomDto room;
 
     @NotNull
