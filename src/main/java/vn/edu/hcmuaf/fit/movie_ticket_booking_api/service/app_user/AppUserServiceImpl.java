@@ -171,6 +171,36 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public UserLoginResponse loginAdmin(UserLoginRequest loginRequest) throws BaseException {
+        try {
+            AppUserDomain appUserDomain = (AppUserDomain) loadUserByUsername(loginRequest.getEmail());
+            if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), appUserDomain.getPassword())) {
+                throw new BadRequestException("Email hoặc mật khẩu không đúng");
+            }
+
+            if (!appUserDomain.isAccountNonLocked()) {
+                throw new BadRequestException("Tài khoản của bạn đã bị khóa");
+            }
+
+            if (!appUserDomain.isEnabled()) {
+                throw new BadRequestException("Tài khoản của bạn chưa được kích hoạt");
+            }
+
+            // Generate token
+            String userToken = appJwtTokenProvider.generateJwtToken(appUserDomain);
+
+            return UserLoginResponse.builder()
+                    .userId(appUserDomain.getUserId())
+                    .token(userToken)
+                    .email(appUserDomain.getEmail())
+                    .avatar(appUserDomain.getAvatar())
+                    .build();
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @Override
     public UserLoginResponse loginWithFacebook(String accessToken) throws BaseException {
         try {
             AppUserFacebook appUserFacebook = getFacebookProfile(accessToken);
@@ -318,7 +348,7 @@ public class AppUserServiceImpl implements AppUserService {
             throw new BadRequestException("Please verify your email");
         }
 
-        return userInfoMapper.toUserInfoDto(appUser.getUserInfo());
+        return userInfoMapper.toUserInfoDto(appUser);
     }
 
     @Override

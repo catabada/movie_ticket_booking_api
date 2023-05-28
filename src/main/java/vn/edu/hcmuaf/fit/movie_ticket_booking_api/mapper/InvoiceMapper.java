@@ -19,7 +19,15 @@ public interface InvoiceMapper {
     @Mapping(target = "showtime", source = "showtime", qualifiedByName = "toShowtimeDtoWithoutInvoices")
     @Mapping(target = "tickets", source = "tickets", qualifiedByName = "toTicketDto")
     @Mapping(target = "invoiceCombos", source = "invoiceCombos", qualifiedByName = "toInvoiceComboDtoWithoutInvoice")
+//    @Mapping(target = "appUser", ignore = true)
     InvoiceDto toInvoiceDto(Invoice userInvoice);
+
+    @Named("toInvoiceDtoWithoutAppUser")
+    @Mapping(target = "showtime", source = "showtime", qualifiedByName = "toShowtimeDtoWithoutInvoices")
+    @Mapping(target = "tickets", source = "tickets", qualifiedByName = "toTicketDto")
+    @Mapping(target = "invoiceCombos", source = "invoiceCombos", qualifiedByName = "toInvoiceComboDtoWithoutInvoice")
+    @Mapping(target = "appUser", ignore = true)
+    InvoiceDto toInvoiceDtoWithoutAppUser(Invoice userInvoice);
 
     Invoice toInvoice(InvoiceDto invoiceDto);
 

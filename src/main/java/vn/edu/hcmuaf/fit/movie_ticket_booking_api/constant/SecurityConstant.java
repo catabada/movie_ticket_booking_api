@@ -39,6 +39,7 @@ public class SecurityConstant {
             "/**/create",
             "/**/update",
             "/**/delete",
+            "/statistic/**",
     };
 
 }
