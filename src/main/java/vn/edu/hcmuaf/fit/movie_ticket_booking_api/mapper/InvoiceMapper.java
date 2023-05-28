@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper;
 
 import org.mapstruct.*;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceComboDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.TicketDto;

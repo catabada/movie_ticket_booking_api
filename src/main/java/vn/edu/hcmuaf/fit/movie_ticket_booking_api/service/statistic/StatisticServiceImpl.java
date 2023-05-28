@@ -9,7 +9,9 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Invoice;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.invoice.InvoiceRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -22,12 +24,21 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     @Override
-    public List<Long> getStatistic(StatisticFilter filter) {
-        List<Long> result = new ArrayList<>();
+    public Map<Integer, Long> getStatistic(StatisticFilter filter) {
+        Map<Integer, Long> result = new HashMap<>();
 
         switch (filter.getValue()) {
             case REVENUE -> {
                 return invoiceRepository.getTotalRevenue(filter.getTimeline());
+            }
+            case TICKET -> {
+                return invoiceRepository.getTotalTicket(filter.getTimeline());
+            }
+            case MOVIE -> {
+                return invoiceRepository.getRevenueByMovie(filter.getTimeline(), filter.getMovieId());
+            }
+            case BRANCH -> {
+                return invoiceRepository.getRevenueByBranch(filter.getTimeline(), filter.getBranchId());
             }
         }
 

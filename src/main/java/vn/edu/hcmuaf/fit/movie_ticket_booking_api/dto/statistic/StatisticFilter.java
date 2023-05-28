@@ -12,4 +12,6 @@ import lombok.experimental.SuperBuilder;
 public class StatisticFilter {
     private StatisticValue value;
     private StatisticTimeline timeline;
+    private Long movieId;
+    private Long branchId;
 }
