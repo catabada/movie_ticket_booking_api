@@ -42,8 +42,7 @@ public class RoomCustomRepositoryImpl extends AbstractCustomRepository<Room, Lon
         return queryFactory
                 .selectFrom(qRoom)
                 .innerJoin(qRoom.branch, qBranch)
-                .where(booleanBuilder.and(
-                                qRoom.branch.id.eq(search.getBranch().getId()))
+                .where(booleanBuilder
                         .and(qBranch.state.ne(ObjectState.DELETED))
                 )
                 .fetch();

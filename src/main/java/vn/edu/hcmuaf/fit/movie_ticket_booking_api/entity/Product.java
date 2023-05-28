@@ -30,6 +30,4 @@ public class Product extends BaseObject {
     @Column(name="stock")
     private Integer stock;
 
-    @Column(name = "image")
-    private String image;
 }

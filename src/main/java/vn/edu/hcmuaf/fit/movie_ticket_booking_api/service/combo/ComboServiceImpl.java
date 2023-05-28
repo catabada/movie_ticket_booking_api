@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.combo.ComboDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.combo.ComboItemDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.product.ProductDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Combo;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.ComboItem;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Product;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.NotFoundException;
@@ -16,6 +18,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.ProductMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.combo.ComboCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.product.ProductCustomRepository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -50,20 +53,53 @@ public class ComboServiceImpl implements ComboService {
     @Transactional
     public ComboDto createCombo(ComboDto comboDto) throws BadRequestException {
 
-        Combo combo = comboCustomRepository.saveAndFlush(comboMapper.toCombo(comboDto));
+        Combo combo = comboMapper.toCombo(comboDto);
+
+        for(ComboItem item : combo.getComboItems()) {
+            item.setCombo(combo);
+        }
+
+        combo.setComboItems(combo.getComboItems());
+
+        combo = comboCustomRepository.saveAndFlush(combo);
+
         if (ObjectUtils.isEmpty(combo)) throw new BadRequestException("Tạo dữ liệu không thành công");
 
         return comboMapper.toComboDto(combo);
     }
 
     @Override
-    public ComboDto updateCombo(ComboDto comboDto) {
-        return null;
+    @Transactional
+    public ComboDto updateCombo(ComboDto comboDto) throws BadRequestException {
+        comboCustomRepository.getCombo(comboDto.getId()).orElseThrow(
+                () -> new BadRequestException("Không tìm thấy combo")
+        );
+
+        Combo combo = comboMapper.toCombo(comboDto);
+
+        for(ComboItem item : combo.getComboItems()) {
+            item.setCombo(combo);
+        }
+
+        combo.setComboItems(combo.getComboItems());
+
+        combo = comboCustomRepository.saveAndFlush(combo);
+
+        if (ObjectUtils.isEmpty(combo)) throw new BadRequestException("Cập nhật dữ liệu không thành công");
+
+        return comboMapper.toComboDto(combo);
     }
 
     @Override
-    public void deleteCombo(Long id) {
+    @Transactional
+    public void deleteCombo(Long id) throws BadRequestException {
+        Combo combo = comboCustomRepository.getCombo(id).orElseThrow(
+                () -> new BadRequestException("Không tìm thấy combo")
+        );
+        combo.setState(ObjectState.DELETED);
+        combo.setDeletedDate(ZonedDateTime.now());
 
+        comboCustomRepository.saveAndFlush(combo);
     }
 
     private ProductDto checkExistProduct(ComboItemDto comboItemDto) throws NotFoundException {

@@ -17,6 +17,7 @@ public interface AppUserService extends UserDetailsService {
     void resendEmailVerifyRegister(final String email) throws BaseException;
 
     UserLoginResponse login(final UserLoginRequest loginRequest) throws BaseException;
+    UserLoginResponse loginAdmin(final UserLoginRequest loginRequest) throws BaseException;
 
     UserLoginResponse loginWithFacebook(final String accessToken) throws BaseException;
 

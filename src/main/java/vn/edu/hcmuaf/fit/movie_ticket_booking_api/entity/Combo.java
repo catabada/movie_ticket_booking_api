@@ -21,8 +21,15 @@ public class Combo extends BaseObject {
     @Column(name = "price")
     private Long price;
 
-    @OneToMany(mappedBy = "combo", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @Column(name = "image")
+    private String image;
+
+    @OneToMany(mappedBy = "combo", cascade = CascadeType.ALL)
     private List<ComboItem> comboItems;
 
+    public void addComboItem(ComboItem item) {
+        comboItems.add(item);
+        item.setCombo(this);
+    }
 
 }

@@ -15,5 +15,6 @@ import java.util.List;
 public class ComboDto extends BaseObjectDto {
     private String name;
     private Long price;
+    private String image;
     private List<ComboItemDto> comboItems;
 }

@@ -31,7 +31,7 @@ public class InvoiceDto extends BaseObjectDto {
     @Email(message = "Email không hợp lệ")
     private String email;
 
-    @NotBlank(message = "Tổng tiền không được để trống")
+//    @Min(value = 10000L, message = "Số tiền phải lớn hơn 10.000")
     private Long totalPrice;
 
     private AppUserDto appUser;

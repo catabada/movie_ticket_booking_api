@@ -16,5 +16,4 @@ public class ProductDto extends BaseObjectDto {
     private Long price;
     private ProductType productType;
     private Integer stock;
-    private String image;
 }

@@ -11,5 +11,5 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.branch.BranchDto;
 @SuperBuilder
 @NoArgsConstructor
 public class RoomSearch {
-    BranchDto branch;
+    private BranchDto branch;
 }

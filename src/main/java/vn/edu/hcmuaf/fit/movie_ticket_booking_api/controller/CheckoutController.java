@@ -1,7 +1,7 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +13,10 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponseSuccess;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.service.checkout.CheckoutService;
 
-@Slf4j
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("/checkout")
+@CrossOrigin("*")
 public class CheckoutController {
     private final CheckoutService checkoutService;
 
@@ -26,7 +26,7 @@ public class CheckoutController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpResponse> checkout(@RequestBody InvoiceCreate invoiceCreate, HttpServletRequest request) throws Exception {
+    public ResponseEntity<HttpResponse> checkout(@RequestBody @Valid InvoiceCreate invoiceCreate, HttpServletRequest request) throws Exception {
         switch (invoiceCreate.getPaymentMethod()) {
             case MOMO -> {
                 return ResponseEntity.ok(HttpResponseSuccess.success(checkoutService.checkoutMomo(invoiceCreate)).build());
@@ -40,7 +40,6 @@ public class CheckoutController {
 
     @RequestMapping("/momo/return")
     public ResponseEntity<HttpResponse> returnByMomo(CaptureMoMoConfirmResponse captureMoMoConfirmResponse) throws Exception {
-        System.out.println("Hello");
         checkoutService.returnByMomo(captureMoMoConfirmResponse);
         return ResponseEntity.ok(HttpResponseSuccess.success().build());
     }

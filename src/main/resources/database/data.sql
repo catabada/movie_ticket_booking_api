@@ -94,3 +94,10 @@ INSERT INTO movie_genre
 VALUES (11, 2);
 INSERT INTO movie_genre
 VALUES (17, 2);
+
+INSERT INTO movie_movie_formats(movie_id, movie_formats)
+values (1, 'TWO_D'),
+       (1, 'THREE_D'),
+       (1, 'VOICE_OVER'),
+       (2, 'TWO_D'),
+       (2, 'THREE_D');
