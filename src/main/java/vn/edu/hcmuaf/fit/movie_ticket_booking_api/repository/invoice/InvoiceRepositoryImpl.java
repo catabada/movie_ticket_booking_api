@@ -56,6 +56,24 @@ public class InvoiceRepositoryImpl extends AbstractCustomRepository<Invoice, Lon
         Map<Integer, Long> map = new HashMap<>();
 
         switch (timeline) {
+            case DAY -> {
+                map.put(1, 0L);
+                queryFactory.select(qInvoice.paymentDate, qInvoice.totalPrice.sum())
+                        .from(qInvoice)
+                        .where(
+                                qInvoice.state.ne(ObjectState.DELETED),
+                                qInvoice.paymentStatus.eq(PaymentStatus.SUCCESS),
+                                qInvoice.paymentDate.year().eq(now.getYear()),
+                                qInvoice.paymentDate.month().eq(now.getMonthValue()),
+                                qInvoice.paymentDate.dayOfMonth().eq(now.getDayOfMonth()))
+                        .groupBy(qInvoice.paymentDate)
+                        .fetch()
+                        .stream().forEach(e -> {
+                            map.put(1, e.get(1, Long.class) + map.get(1));
+                        });
+
+                return map;
+            }
             // this week
             case WEEK -> {
                 for (int i = 1; i <= 7; i++) {
@@ -129,6 +147,26 @@ public class InvoiceRepositoryImpl extends AbstractCustomRepository<Invoice, Lon
         Map<Integer, Long> map = new HashMap<>();
 
         switch (timeline) {
+            case DAY -> {
+                map.put(1, 0L);
+
+                queryFactory.select(qInvoice.paymentDate, qTicket.count())
+                        .from(qInvoice)
+                        .innerJoin(qInvoice.tickets, qTicket)
+                        .where(
+                                qInvoice.state.ne(ObjectState.DELETED),
+                                qInvoice.paymentStatus.eq(PaymentStatus.SUCCESS),
+                                qInvoice.paymentDate.year().eq(now.getYear()),
+                                qInvoice.paymentDate.month().eq(now.getMonthValue()),
+                                qInvoice.paymentDate.dayOfMonth().eq(now.getDayOfMonth()))
+                        .groupBy(qInvoice.paymentDate)
+                        .fetch()
+                        .stream().forEach(e -> {
+                            map.put(1, e.get(1, Long.class) + map.get(1));
+                        });
+
+                return map;
+            }
             // this week
             case WEEK -> {
                 for (int i = 1; i <= 7; i++) {
@@ -208,6 +246,31 @@ public class InvoiceRepositoryImpl extends AbstractCustomRepository<Invoice, Lon
         Map<Integer, Long> map = new HashMap<>();
 
         switch (timeline) {
+
+            // this day
+            case DAY -> {
+                map.put(1, 0L);
+
+                queryFactory.selectDistinct(qInvoice.paymentDate, qInvoice.totalPrice.sum())
+                        .from(qInvoice)
+                        .innerJoin(qInvoice.showtime, qShowtime)
+                        .innerJoin(qShowtime.movie, qMovie)
+                        .where(
+                                qInvoice.state.ne(ObjectState.DELETED),
+                                qMovie.id.eq(movieId),
+                                qInvoice.paymentStatus.eq(PaymentStatus.SUCCESS),
+                                qInvoice.paymentDate.year().eq(now.getYear()),
+                                qInvoice.paymentDate.month().eq(now.getMonthValue()),
+                                qInvoice.paymentDate.dayOfMonth().eq(now.getDayOfMonth()))
+                        .groupBy(qInvoice.paymentDate, qMovie.id)
+                        .fetch()
+                        .stream().forEach(e -> {
+                            map.put(1, e.get(1, Long.class) + map.get(1));
+                        });
+
+                return map;
+            }
+
             // this week
             case WEEK -> {
                 for (int i = 1; i <= 7; i++) {
@@ -294,6 +357,32 @@ public class InvoiceRepositoryImpl extends AbstractCustomRepository<Invoice, Lon
         Map<Integer, Long> map = new HashMap<>();
 
         switch (timeline) {
+
+            // this day
+            case DAY -> {
+                map.put(1, 0L);
+
+                queryFactory.selectDistinct(qInvoice.paymentDate, qInvoice.totalPrice.sum())
+                        .from(qInvoice)
+                        .innerJoin(qInvoice.showtime, qShowtime)
+                        .innerJoin(qShowtime.room, qRoom)
+                        .innerJoin(qRoom.branch, qBranch)
+                        .where(
+                                qInvoice.state.ne(ObjectState.DELETED),
+                                qBranch.id.eq(branchId),
+                                qInvoice.paymentStatus.eq(PaymentStatus.SUCCESS),
+                                qInvoice.paymentDate.year().eq(now.getYear()),
+                                qInvoice.paymentDate.month().eq(now.getMonthValue()),
+                                qInvoice.paymentDate.dayOfMonth().eq(now.getDayOfMonth()))
+                        .groupBy(qInvoice.paymentDate, qBranch.id)
+                        .fetch()
+                        .stream().forEach(e -> {
+                            map.put(1, e.get(1, Long.class) + map.get(1));
+                        });
+
+                return map;
+            }
+
             // this week
             case WEEK -> {
                 for (int i = 1; i <= 7; i++) {
