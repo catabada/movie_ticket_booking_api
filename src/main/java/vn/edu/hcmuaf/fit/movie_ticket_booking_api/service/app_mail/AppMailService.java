@@ -11,7 +11,7 @@ import java.io.IOException;
 public interface AppMailService {
 
     @Async("threadPoolTaskExecutorForVerifyEmail")
-    void sendVerifyEmailRegister(AppUserDto dto) throws MessagingException, IOException, BadRequestException;
+    void sendVerifyEmailRegister(AppUserDto dto) throws BadRequestException;
 
     @Async("threadPoolTaskExecutorResendMail")
     void resendEmailVerifyRegister(AppUserDto appUser) throws MessagingException, BadRequestException, IOException;

@@ -34,6 +34,6 @@ public interface AppUserService extends UserDetailsService {
 
     void resetPassword(final ResetPasswordRequest resetPasswordRequest) throws BaseException;
 
-    String uploadAvatar(final MultipartFile file) throws BaseException;
+    void uploadAvatar(final String avatarUrl) throws BaseException;
 
 }

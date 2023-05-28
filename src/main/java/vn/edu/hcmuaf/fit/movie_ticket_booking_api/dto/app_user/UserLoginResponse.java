@@ -13,6 +13,5 @@ public class UserLoginResponse {
     private Long userId;
     private String token;
     private String email;
-    private String fullName;
     private String avatar;
 }

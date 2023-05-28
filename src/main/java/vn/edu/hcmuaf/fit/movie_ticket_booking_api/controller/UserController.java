@@ -1,5 +1,6 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.controller;
 
+import jakarta.validation.Valid;
 import org.mapstruct.ap.shaded.freemarker.ext.beans._BeansAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.FileConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.*;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.user_info.AvatarRequest;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.user_info.UserInfoUpdate;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
@@ -43,7 +45,7 @@ public class UserController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<HttpResponse> updateProfile(@RequestBody UserInfoUpdate update) throws BaseException {
+    public ResponseEntity<HttpResponse> updateProfile(@RequestBody @Valid UserInfoUpdate update) throws BaseException {
         appUserService.updateProfile(update);
         return ResponseEntity.ok(HttpResponseSuccess.success().build());
 
@@ -56,9 +58,9 @@ public class UserController {
     }
 
     @PutMapping("/upload-avatar")
-    public ResponseEntity<HttpResponse> uploadAvatar(@RequestParam("avatar") MultipartFile file) throws BaseException {
-        appUserService.uploadAvatar(file);
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
+    public ResponseEntity<HttpResponse> uploadAvatar(@RequestBody AvatarRequest avatarRequest) throws BaseException {
+        appUserService.uploadAvatar(avatarRequest.getAvatarUrl());
+        return ResponseEntity.ok(HttpResponseSuccess.success("Cập nhật ảnh đại diện thành công").data(avatarRequest.getAvatarUrl()).build());
     }
 
     @GetMapping(path = "/image/profile/{username}", produces = IMAGE_JPEG_VALUE)

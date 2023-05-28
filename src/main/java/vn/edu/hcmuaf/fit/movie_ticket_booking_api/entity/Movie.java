@@ -10,11 +10,8 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.MovieFormat;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.MovieState;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "movie")

@@ -3,12 +3,12 @@ package vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.handler.response.HttpResponse;
 
 @Getter
 @Setter
 public class HttpResponseSuccess extends HttpResponse {
     private Object data;
+    private String message;
 
     public HttpResponseSuccess(Builder builder) {
         super(builder);
@@ -27,8 +27,17 @@ public class HttpResponseSuccess extends HttpResponse {
         return builder().success().data(object);
     }
 
+    public static Builder success(Object object, String message) {
+        return builder().success().data(object).message(message);
+    }
+
+    public static Builder success(String message) {
+        return builder().success().message(message);
+    }
+
     public static class Builder extends AbstractBuilder<Builder> {
         protected Object data;
+        protected String message;
 
         protected Builder() {
             super();
@@ -40,6 +49,11 @@ public class HttpResponseSuccess extends HttpResponse {
 
         public Builder data(final Object data) {
             this.data = data;
+            return self();
+        }
+
+        public Builder message(final String message) {
+            this.message = message;
             return self();
         }
 

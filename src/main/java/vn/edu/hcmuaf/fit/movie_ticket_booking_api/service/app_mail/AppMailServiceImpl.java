@@ -59,7 +59,7 @@ public class AppMailServiceImpl implements AppMailService {
     @Override
     @Async("threadPoolTaskExecutorForVerifyEmailRegister")
     @Transactional
-    public void sendVerifyEmailRegister(AppUserDto dto) throws MessagingException, IOException, BadRequestException {
+    public void sendVerifyEmailRegister(AppUserDto dto) throws BadRequestException {
         VerificationToken token = VerificationToken.builder()
                 .token(UUID.randomUUID())
                 .appUser(appUserMapper.toAppUser(dto))
@@ -75,7 +75,7 @@ public class AppMailServiceImpl implements AppMailService {
 
         boolean success = sendVerifyEmailRegister(dto.getEmail(), token.getToken().toString());
 
-        if (!success) throw new BadRequestException("Send verify email failed");
+        if (!success) throw new BadRequestException("Gửi email xác thực thất bại");
     }
 
     @Override

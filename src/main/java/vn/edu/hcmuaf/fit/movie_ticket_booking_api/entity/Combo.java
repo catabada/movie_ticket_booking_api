@@ -25,5 +25,4 @@ public class Combo extends BaseObject {
     private List<ComboItem> comboItems;
 
 
-
 }

@@ -25,7 +25,7 @@ public class AuthController {
     @Value("${app.config.url.login}")
     private String loginUrl;
 
-    @Value("${app.config.url.reset-password")
+    @Value("${app.config.url.reset-password}")
     private String resetPasswordUrl;
 
     @Value("${app.config.url.verify-failed}")
@@ -43,7 +43,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<HttpResponse> register(@RequestBody UserRegisterDto register) throws BaseException {
         appUserService.register(register.getUserRegister());
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
+        return ResponseEntity.ok(HttpResponseSuccess.success("Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản").build());
     }
 
     @PostMapping("/login")
@@ -75,13 +75,13 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<HttpResponse> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws BaseException {
         appUserService.forgotPassword(forgotPasswordRequest);
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
+        return ResponseEntity.ok(HttpResponseSuccess.success("Gửi email cài đặt mật khẩu mới thành công").build());
     }
 
     @PutMapping("/reset-password")
     public ResponseEntity<HttpResponse> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) throws BaseException {
         appUserService.resetPassword(resetPasswordRequest);
-        return ResponseEntity.ok(HttpResponseSuccess.success().build());
+        return ResponseEntity.ok(HttpResponseSuccess.success("Cài đặt mật khẩu mới thành công").build());
     }
 
     @PostMapping("/resend-email/register")
@@ -103,6 +103,6 @@ public class AuthController {
     @GetMapping("/verify-reset-password/{token}")
     public ResponseEntity<HttpResponse> verifyResetPassword(@PathVariable String token) throws BaseException {
         appUserService.verifyEmailResetPassword(token);
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(resetPasswordUrl)).build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(resetPasswordUrl + "?token=" + token)).build();
     }
 }

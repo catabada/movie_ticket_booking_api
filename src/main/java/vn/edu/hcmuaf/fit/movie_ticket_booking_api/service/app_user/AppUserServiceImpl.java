@@ -15,12 +15,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.BeanIdConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.FileConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoleConstant;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.UploadFile;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.VerificationConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.domain.AppUserDomain;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.user_info.UserInfoDto;
@@ -34,7 +32,6 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.infrastructure.AppJwtTokenProvider;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.AppUserMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.UserInfoMapper;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.entity.MediaFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.service.FileService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.service.image.ImageFileService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.app_role.AppRoleRepository;
@@ -87,36 +84,31 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public void register(AppUserDto dto) throws BaseException {
-        try {
-            boolean userByEmail = appUserCustomRepository.existsByEmail(dto.getEmail());
-            if (userByEmail) {
-                throw new BadRequestException("Email đã tồn tại");
-            }
-
-            boolean userByPhone = appUserCustomRepository.findByPhone(dto.getPhone());
-            if (userByPhone) {
-                throw new BadRequestException("Số điện thoại đã tồn tại");
-            }
-
-            AppUser newUser = appUserMapper.toAppUser(dto);
-            // Set role
-            AppRole defaultRole = appRoleRepository.getByName(RoleConstant.ROLE_MEMBER).orElse(null);
-            newUser.getAppRoles().add(defaultRole);
-
-            // Random image
-            newUser.getUserInfo().setAvatar(FileConstant.TEMP_PROFILE_IMAGE_BASE_URL + dto.getEmail());
-            // Hash password
-            newUser.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
-
-            // Save user and check save success
-            newUser = appUserCustomRepository.saveAndFlush(newUser);
-
-            // Send verify email
-            appMailService.sendVerifyEmailRegister(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(newUser));
-
-        } catch (Exception e) {
-            throw new BadRequestException("Đăng ký không thành công");
+        boolean userByEmail = appUserCustomRepository.existsByEmail(dto.getEmail());
+        if (userByEmail) {
+            throw new BadRequestException("Email đã tồn tại");
         }
+
+        boolean userByPhone = appUserCustomRepository.findByPhone(dto.getPhone());
+        if (userByPhone) {
+            throw new BadRequestException("Số điện thoại đã tồn tại");
+        }
+
+        AppUser newUser = appUserMapper.toAppUser(dto);
+        // Set role
+        AppRole defaultRole = appRoleRepository.getByName(RoleConstant.ROLE_MEMBER).orElse(null);
+        newUser.getAppRoles().add(defaultRole);
+
+        // Random image
+        newUser.getUserInfo().setAvatar(FileConstant.TEMP_PROFILE_IMAGE_BASE_URL + dto.getEmail());
+        // Hash password
+        newUser.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
+
+        // Save user and check save success
+        newUser = appUserCustomRepository.saveAndFlush(newUser);
+
+        // Send verify email
+        appMailService.sendVerifyEmailRegister(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(newUser));
     }
 
     @Override
@@ -171,7 +163,6 @@ public class AppUserServiceImpl implements AppUserService {
                     .userId(appUserDomain.getUserId())
                     .token(userToken)
                     .email(appUserDomain.getEmail())
-                    .fullName(appUserDomain.getFullName())
                     .avatar(appUserDomain.getAvatar())
                     .build();
         } catch (Exception e) {
@@ -218,7 +209,6 @@ public class AppUserServiceImpl implements AppUserService {
                     .userId(appUserDomain.getUserId())
                     .token(appJwtTokenProvider.generateJwtToken(appUserDomain))
                     .email(appUserDomain.getEmail())
-                    .fullName(appUserDomain.getFullName())
                     .avatar(appUserDomain.getAvatar())
                     .build();
         } catch (Exception e) {
@@ -270,7 +260,6 @@ public class AppUserServiceImpl implements AppUserService {
                     .userId(appUser.getId())
                     .token(appJwtTokenProvider.generateJwtToken(appUserDomain))
                     .email(appUser.getEmail())
-                    .fullName(appUser.getUserInfo().getFullName())
                     .avatar(appUser.getUserInfo().getAvatar())
                     .build();
         } catch (Exception e) {
@@ -303,6 +292,7 @@ public class AppUserServiceImpl implements AppUserService {
 
         appUser.getUserInfo().setFullName(userInfoUpdate.getFullName());
         appUser.getUserInfo().setIsMale(userInfoUpdate.getIsMale());
+        appUser.getUserInfo().setAvatar(userInfoUpdate.getAvatar());
         appUser.getUserInfo().setDateOfBirth(userInfoUpdate.getDateOfBirth());
 
         if (ObjectUtils.isEmpty(appUserCustomRepository.saveAndFlush(appUser))) {
@@ -377,6 +367,12 @@ public class AppUserServiceImpl implements AppUserService {
                 throw new BadRequestException("Your account is locked");
             }
 
+            VerificationToken token = verificationTokenCustomRepository.getVerificationTokenByEmailAndName(forgotPasswordRequest.getEmail(), VerificationConstant.VERIFICATION_RESET_PASSWORD)
+                    .orElse(null);
+            if (token != null && token.getExpiredDate().isAfter(ZonedDateTime.now())) {
+                throw new BadRequestException("Please wait 5 minutes to send again");
+            }
+
             appMailService.sendVerifyMailResetPassword(appUserMapper.toAppUserDtoWithoutAppRolesAndVerificationTokens(appUser));
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
@@ -422,9 +418,8 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public String uploadAvatar(MultipartFile file) throws BaseException {
+    public void uploadAvatar(String avatarUrl) throws BaseException {
         try {
-            if (file.isEmpty()) throw new BadRequestException("File is empty");
             Optional<AppUser> optionalAppUser = appUserCustomRepository.getUserByEmail(AppUtils.getCurrentEmail());
             if (optionalAppUser.isEmpty())
                 throw new BadRequestException("Not found user: " + AppUtils.getCurrentEmail());
@@ -432,20 +427,16 @@ public class AppUserServiceImpl implements AppUserService {
             AppUser appUser = optionalAppUser.get();
 
             if (!appUser.getAccountNonLocked()) {
-                throw new BadRequestException("Your account is locked");
+                throw new BadRequestException("Tài khoản của bạn đã bị khóa");
             }
 
             if (!appUser.getEnabled()) {
-                throw new BadRequestException("Please verify your email");
+                throw new BadRequestException("Vui lòng xác thực email của bạn");
             }
 
-            MediaFile mediaFile = imageFileService.uploadFile(appUser.getEmail(), file, UploadFile.AVATAR_IMAGE);
-            appUser.getUserInfo().setAvatar(mediaFile.getPathFolder());
+            appUser.getUserInfo().setAvatar(avatarUrl);
 
             appUserCustomRepository.saveAndFlush(appUser);
-
-            return ServletUriComponentsBuilder
-                    .fromCurrentContextPath().path(mediaFile.getPathFolder()).toUriString();
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
