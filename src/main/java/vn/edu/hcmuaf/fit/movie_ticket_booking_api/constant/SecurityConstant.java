@@ -34,6 +34,7 @@ public class SecurityConstant {
 
     public final static String[] REQUIRE_ADMIN_ROLE_URLS = {
             "/user/search",
+            "/user/lock",
     };
     public final static String[] REQUIRE_MANAGER_ROLE_URLS = {
             "/**/create",

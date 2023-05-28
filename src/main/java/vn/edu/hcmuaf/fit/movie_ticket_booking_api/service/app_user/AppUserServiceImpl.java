@@ -15,10 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.BeanIdConstant;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.FileConstant;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoleConstant;
-import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.VerificationConstant;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.domain.AppUserDomain;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.user_info.UserInfoDto;
@@ -32,6 +31,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.infrastructure.AppJwtTokenProvider;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.AppUserMapper;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.UserInfoMapper;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.entity.MediaFile;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.service.FileService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.middleware.service.image.ImageFileService;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.app_role.AppRoleRepository;
@@ -42,13 +42,9 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.utilities.AppUtils;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-@Transactional
 @Qualifier(BeanIdConstant.USER_DETAIL_SERVICE)
 public class AppUserServiceImpl implements AppUserService {
     private final AppUserCustomRepository appUserCustomRepository;
@@ -80,6 +76,52 @@ public class AppUserServiceImpl implements AppUserService {
         this.appJwtTokenProvider = appJwtTokenProvider;
         this.userInfoMapper = userInfoMapper;
         this.imageFileService = imageFileService;
+    }
+
+    @Override
+    public List<AppUserDto> searchUser(AppUserSearch search) throws BaseException {
+        String email = AppUtils.getCurrentEmail();
+
+        if (ObjectUtils.isEmpty(email)) {
+            throw new BadRequestException("Vui lòng đăng nhập để thực hiện chức năng này");
+        }
+
+        AppUserDomain appUserDomain = (AppUserDomain) loadUserByUsername(email);
+
+        if (!appUserDomain.isAccountNonLocked()) {
+            throw new BadRequestException("Tài khoản của bạn đã bị khóa");
+        }
+
+        if (!appUserDomain.isEnabled()) {
+            throw new BadRequestException("Vui lòng xác thực email của bạn");
+        }
+        if (appUserDomain.getAuthorities().stream()
+                .noneMatch(
+                        role -> role.getAuthority().equals(RoleConstant.ROLE_ADMIN)
+                )
+        ) {
+            throw new BadRequestException("Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ với quản trị viên để được hỗ trợ");
+        }
+
+       return appUserMapper.toAppUserDtoList(appUserCustomRepository.getUserSearch(search));
+    }
+
+    @Override
+    public void lockUser(Long id) throws BaseException {
+        Optional<AppUser> user = appUserCustomRepository.findById(id);
+
+        if (user.isEmpty()) {
+            throw new BadRequestException("Không tìm thấy người dùng");
+        }
+
+        AppUser appUser = user.get();
+
+        appUser.setAccountNonLocked(!appUser.getAccountNonLocked());
+
+        if (ObjectUtils.isEmpty(appUserCustomRepository.saveAndFlush(user.get()))) {
+            throw new BadRequestException("Khóa người dùng thất bại");
+        }
+
     }
 
     @Override
@@ -142,6 +184,36 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public UserLoginResponse login(UserLoginRequest loginRequest) throws BaseException {
+        try {
+            AppUserDomain appUserDomain = (AppUserDomain) loadUserByUsername(loginRequest.getEmail());
+            if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), appUserDomain.getPassword())) {
+                throw new BadRequestException("Email hoặc mật khẩu không đúng");
+            }
+
+            if (!appUserDomain.isAccountNonLocked()) {
+                throw new BadRequestException("Tài khoản của bạn đã bị khóa");
+            }
+
+            if (!appUserDomain.isEnabled()) {
+                throw new BadRequestException("Tài khoản của bạn chưa được kích hoạt");
+            }
+
+            // Generate token
+            String userToken = appJwtTokenProvider.generateJwtToken(appUserDomain);
+
+            return UserLoginResponse.builder()
+                    .userId(appUserDomain.getUserId())
+                    .token(userToken)
+                    .email(appUserDomain.getEmail())
+                    .avatar(appUserDomain.getAvatar())
+                    .build();
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @Override
+    public UserLoginResponse loginAdmin(UserLoginRequest loginRequest) throws BaseException {
         try {
             AppUserDomain appUserDomain = (AppUserDomain) loadUserByUsername(loginRequest.getEmail());
             if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), appUserDomain.getPassword())) {
@@ -292,7 +364,6 @@ public class AppUserServiceImpl implements AppUserService {
 
         appUser.getUserInfo().setFullName(userInfoUpdate.getFullName());
         appUser.getUserInfo().setIsMale(userInfoUpdate.getIsMale());
-        appUser.getUserInfo().setAvatar(userInfoUpdate.getAvatar());
         appUser.getUserInfo().setDateOfBirth(userInfoUpdate.getDateOfBirth());
 
         if (ObjectUtils.isEmpty(appUserCustomRepository.saveAndFlush(appUser))) {
@@ -322,6 +393,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    @Transactional
     public void changePassword(ChangePasswordRequest changePasswordRequest) throws BaseException {
         if (!AppUtils.getCurrentEmail().equals(changePasswordRequest.getEmail()))
             throw new BadRequestException("You should login to change password");
@@ -381,7 +453,6 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public void verifyEmailResetPassword(String token) throws BaseException {
-        System.out.println(token);
         try {
             Optional<VerificationToken> optional = verificationTokenCustomRepository.getVerificationTokenByToken(UUID.fromString(token));
 

@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper;
 
 import org.mapstruct.*;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceComboDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.invoice.InvoiceDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.ticket.TicketDto;
@@ -19,6 +20,7 @@ public interface InvoiceMapper {
     @Mapping(target = "showtime", source = "showtime", qualifiedByName = "toShowtimeDtoWithoutInvoices")
     @Mapping(target = "tickets", source = "tickets", qualifiedByName = "toTicketDto")
     @Mapping(target = "invoiceCombos", source = "invoiceCombos", qualifiedByName = "toInvoiceComboDtoWithoutInvoice")
+    @Mapping(target = "appUser.invoices", ignore = true)
     InvoiceDto toInvoiceDto(Invoice userInvoice);
 
     Invoice toInvoice(InvoiceDto invoiceDto);
@@ -27,5 +29,8 @@ public interface InvoiceMapper {
     List<InvoiceDto> toInvoiceDtoList(List<Invoice> invoices);
 
     List<Invoice> toInvoiceList(List<InvoiceDto> invoiceDtos);
+
+    @Mapping(target = "invoices", ignore = true)
+    AppUserDto toAppUserDtoWithoutInvoices(final Invoice invoice);
 
 }

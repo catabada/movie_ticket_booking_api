@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.RoleConstant;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.AppRole;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 @SpringBootApplication
 @Slf4j
 @EnableAsync
+@EnableScheduling
 public class MovieTicketBookingApiApplication {
 
 	public static void main(String[] args) {

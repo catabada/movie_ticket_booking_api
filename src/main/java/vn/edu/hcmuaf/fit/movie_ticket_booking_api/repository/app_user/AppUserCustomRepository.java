@@ -1,14 +1,18 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.app_user;
 
 import org.springframework.data.repository.NoRepositoryBean;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserSearch;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.AppUser;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.UserInfo;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.ICustomRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @NoRepositoryBean
 public interface AppUserCustomRepository extends ICustomRepository<AppUser, Long> {
+
+    List<AppUser> getUserSearch(final AppUserSearch search);
     Optional<AppUser> getUser(final Long id);
 
     Optional<AppUser> getUserProfile(final Long id);

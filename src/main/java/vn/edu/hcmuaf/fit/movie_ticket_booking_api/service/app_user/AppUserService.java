@@ -9,7 +9,14 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BaseException;
 
 import java.io.IOException;
 
+import java.util.List;
+
 public interface AppUserService extends UserDetailsService {
+
+    List<AppUserDto> searchUser(final AppUserSearch search) throws BaseException;
+
+    void lockUser(final Long id) throws BaseException;
+
     void register(final AppUserDto appUserDto) throws BaseException;
 
     Boolean verifyEmail(final String token) throws BaseException;
@@ -17,6 +24,7 @@ public interface AppUserService extends UserDetailsService {
     void resendEmailVerifyRegister(final String email) throws BaseException;
 
     UserLoginResponse login(final UserLoginRequest loginRequest) throws BaseException;
+
     UserLoginResponse loginAdmin(final UserLoginRequest loginRequest) throws BaseException;
 
     UserLoginResponse loginWithFacebook(final String accessToken) throws BaseException;

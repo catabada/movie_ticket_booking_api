@@ -1,11 +1,14 @@
 package vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.app_user;
 
+import com.querydsl.core.BooleanBuilder;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.constant.ObjectState;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_user.AppUserSearch;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.auth.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.AbstractCustomRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,6 +25,13 @@ public class AppUserCustomRepositoryImpl extends AbstractCustomRepository<AppUse
     @Override
     public void saveAll() {
 
+    }
+
+    @Override
+    public List<AppUser> getUserSearch(AppUserSearch search) {
+        return queryFactory.selectFrom(qAppUser)
+                .where(getBooleanBuilder(search))
+                .fetch();
     }
 
     @Override
@@ -99,6 +109,12 @@ public class AppUserCustomRepositoryImpl extends AbstractCustomRepository<AppUse
     @Override
     public Optional<AppUser> getUserByGoogleId(String googleId) {
         return Optional.empty();
+    }
+
+
+    public BooleanBuilder getBooleanBuilder(AppUserSearch search) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        return booleanBuilder;
     }
 
 

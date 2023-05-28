@@ -38,6 +38,11 @@ public class UserController {
         this.appUserService = appUserService;
     }
 
+    @PostMapping("/search")
+    public ResponseEntity<HttpResponse> getUserSearch(@RequestBody AppUserSearch search) throws BaseException {
+        return ResponseEntity.ok(HttpResponseSuccess.success(appUserService.searchUser(search)).build());
+    }
+
 
     @GetMapping("/profile")
     public ResponseEntity<HttpResponse> getProfile() throws BaseException {
@@ -77,6 +82,12 @@ public class UserController {
             }
         }
         return byteArrayOutputStream.toByteArray();
+    }
+
+    @PostMapping("/lock/{id}")
+    public ResponseEntity<HttpResponse> lockUser(@PathVariable("id") Long id) throws BaseException {
+        appUserService.lockUser(id);
+        return ResponseEntity.ok(HttpResponseSuccess.success().build());
     }
 
 }

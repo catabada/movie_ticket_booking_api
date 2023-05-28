@@ -21,6 +21,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.exception.BadRequestException;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.mapper.*;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.app_user.AppUserCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.invoice.InvoiceRepository;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.product.ProductCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.seat.SeatCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.showtime.ShowtimeCustomRepository;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.repository.ticket.TicketCustomRepository;
@@ -42,6 +43,7 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final ShowtimeCustomRepository showtimeCustomRepository;
     private final SeatCustomRepository seatCustomRepository;
     private final TicketCustomRepository ticketCustomRepository;
+    private final ProductCustomRepository productCustomRepository;
     private final PaymentService paymentService;
     private final AppUserMapper appUserMapper;
     private final InvoiceMapper invoiceMapper;
@@ -61,10 +63,12 @@ public class CheckoutServiceImpl implements CheckoutService {
                                AppMailService appMailService,
                                InvoiceComboMapper invoiceComboMapper,
                                NoticeService noticeService,
+                               ProductCustomRepository productCustomRepository,
                                NoticeMapper noticeMapper
     ) {
         this.appUserCustomRepository = appUserCustomRepository;
         this.invoiceRepository = invoiceRepository;
+        this.productCustomRepository = productCustomRepository;
         this.showtimeCustomRepository = showtimeCustomRepository;
         this.seatCustomRepository = seatCustomRepository;
         this.ticketCustomRepository = ticketCustomRepository;
@@ -124,6 +128,12 @@ public class CheckoutServiceImpl implements CheckoutService {
         }
 
         for (InvoiceCombo invoiceCombo : invoice.getInvoiceCombos()) {
+            for (ComboItem comboItem : invoiceCombo.getCombo().getComboItems()) {
+                if (comboItem.getQuantity() * invoiceCombo.getQuantity() > comboItem.getProduct().getStock()) {
+                    throw new BadRequestException("Số lượng sản phẩm trong combo" + invoiceCombo.getCombo().getName() + " không đủ");
+                }
+            }
+
             invoiceCombo.setInvoice(invoice);
         }
 
@@ -139,7 +149,6 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Override
     public MomoResponse checkoutMomo(InvoiceCreate invoiceCreate) throws Exception {
-        System.out.println("invoice: " + invoiceCreate.toString());
         return paymentService.createMomoCapturePayment(checkout(invoiceCreate));
     }
 
@@ -148,24 +157,32 @@ public class CheckoutServiceImpl implements CheckoutService {
         Invoice invoice = invoiceRepository.findByCode(captureMoMoConfirmResponse.getOrderId())
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy hóa đơn"));
 
-        Optional<AppUser> optional = appUserCustomRepository.getUserByEmail(invoice.getEmail());
-        if (optional.isPresent()) {
-            NoticeDto notice = NoticeDto.builder()
-                    .id(0L)
-                    .description("Bạn đã đặt vé thành công với hóa đơn " + invoice.getCode())
-                    .type(NoticeType.BOOKED)
-                    .isRead(false)
-                    .state(ObjectState.ACTIVE)
-                    .appUser(AppUserDto.builder().email(optional.get().getEmail()).build())
-                    .build();
-
-            noticeService.createNotice(notice);
-        } else {
-            throw new BadRequestException("Không tìm thấy người dùng");
-        }
-
         InvoiceDto invoiceDto = invoiceMapper.toInvoiceDto(invoice);
         if (captureMoMoConfirmResponse.getResultCode() == 0) {
+            for(InvoiceCombo invoiceCombo: invoice.getInvoiceCombos()) {
+                for (ComboItem comboItem : invoiceCombo.getCombo().getComboItems()) {
+                    Product product = comboItem.getProduct();
+                    product.setStock(product.getStock() - comboItem.getQuantity() * invoiceCombo.getQuantity());
+                    productCustomRepository.saveAndFlush(product);
+                }
+            }
+
+            Optional<AppUser> optional = appUserCustomRepository.getUserByEmail(invoice.getEmail());
+            if (optional.isPresent()) {
+                NoticeDto notice = NoticeDto.builder()
+                        .id(0L)
+                        .description("Bạn đã đặt vé thành công với hóa đơn " + invoice.getCode())
+                        .type(NoticeType.BOOKED)
+                        .isRead(false)
+                        .state(ObjectState.ACTIVE)
+                        .appUser(AppUserDto.builder().email(optional.get().getEmail()).build())
+                        .build();
+
+                noticeService.createNotice(notice);
+            } else {
+                throw new BadRequestException("Không tìm thấy người dùng");
+            }
+
             invoice.setPaymentStatus(PaymentStatus.SUCCESS);
             invoice.setPaymentDate(ZonedDateTime.now());
             invoiceRepository.save(invoice);

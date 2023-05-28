@@ -15,8 +15,8 @@ import java.util.Optional;
 @Repository
 public class InvoiceRepositoryImpl extends AbstractCustomRepository<Invoice, Long> implements InvoiceRepository {
     private final QInvoice qInvoice = QInvoice.invoice;
-//    private final QInvoiceCombo qInvoiceCombo = QInvoiceCombo.invoiceCombo;
-//    private final QShowtime qShowtime = QShowtime.showtime;
+    //    private final QInvoiceCombo qInvoiceCombo = QInvoiceCombo.invoiceCombo;
+    private final QShowtime qShowtime = QShowtime.showtime;
 //    private final QTicket qTicket = QTicket.ticket;
 
     protected InvoiceRepositoryImpl(EntityManager entityManager) {
@@ -39,6 +39,7 @@ public class InvoiceRepositoryImpl extends AbstractCustomRepository<Invoice, Lon
     @Override
     public List<Invoice> search(InvoiceSearch search) {
         return queryFactory.selectFrom(qInvoice)
+                .innerJoin(qInvoice.showtime, qShowtime).fetchJoin()
                 .where(buildSearchCondition(search))
                 .fetch();
     }
@@ -48,6 +49,17 @@ public class InvoiceRepositoryImpl extends AbstractCustomRepository<Invoice, Lon
 
         if (!ObjectUtils.isEmpty(search.getCode())) {
             builder.and(qInvoice.code.containsIgnoreCase(search.getCode()));
+        }
+
+        if (!ObjectUtils.isEmpty(search.getStartTime())) {
+            builder.and(
+                    qShowtime.startTime.dayOfMonth().eq(search.getStartTime().getDayOfMonth())
+                            .and(qShowtime.startTime.month().eq(search.getStartTime().getMonthValue()))
+                            .and(qShowtime.startTime.year().eq(search.getStartTime().getYear()))
+                            .and(qShowtime.startTime.hour().eq(search.getStartTime().getHour()))
+                            .and(qShowtime.startTime.minute().eq(search.getStartTime().getMinute()))
+                            .and(qShowtime.startTime.second().eq(search.getStartTime().getSecond()))
+            );
         }
 
         if (!ObjectUtils.isEmpty(search.getUserId())) {

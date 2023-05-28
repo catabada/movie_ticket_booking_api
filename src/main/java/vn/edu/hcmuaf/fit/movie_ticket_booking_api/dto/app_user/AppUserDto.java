@@ -12,6 +12,7 @@ import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.app_role.AppRoleDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.object_key.BaseObjectDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.user_info.UserInfoDto;
 import vn.edu.hcmuaf.fit.movie_ticket_booking_api.dto.verification_token.VerificationTokenDto;
+import vn.edu.hcmuaf.fit.movie_ticket_booking_api.entity.Invoice;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ public class AppUserDto extends BaseObjectDto {
     protected String googleId;
     protected Set<AppRoleDto> appRoles;
     protected UserInfoDto userInfo;
+    protected Set<Invoice> invoices;
     protected Set<VerificationTokenDto> verificationTokens;
 
     protected AppUserDto() {
